@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.paulhowells.keycloak</groupId>
+    <artifactId>custom-keycloak-parent</artifactId>
+    <version>1.0.3-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>custom-infinispan-docker-image</module>
+        <module>custom-keycloak-configurer</module>
+        <module>custom-keycloak-configurer-docker-image</module>
+        <module>custom-keycloak-docker-image</module>
+        <module>custom-keycloak-google-iap-jwt-authenticator</module>
+        <module>custom-keycloak-integration-tests</module>
+        <module>custom-keycloak-saml2-bearer-authenticator</module>
+        <module>custom-keycloak-theme-provider</module>
+        <module>custom-keycloak-themes-docker-image</module>
+        <module>custom-keycloak-trusted-first-broker-login-authenticator</module>
+        <module>custom-keycloak-username-identity-provider-redirect</module>
+        <module>gke-topology-helper-docker-image</module>
+        <module>gke-topology-helper</module>
+        <module>keycloak-helm</module>
+        <module>managed-certificate-helm</module>
+        <module>namespace-helm</module>
+        <module>postgres-helm</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <org.keycloak.version>24.0.3</org.keycloak.version>
+
+        <gcp.project.id>keycloak-infinispan-poc</gcp.project.id>
+        <gcp.region.name>us-west1</gcp.region.name>
+        <gcp.repository.name>infinispan-poc-repo</gcp.repository.name>
+
+        <gcp.custom-keycloak-configurer.image.name>custom-keycloak-configurer-docker-image</gcp.custom-keycloak-configurer.image.name>
+        <gcp.custom-keycloak-configurer.image.tag>${gcp.region.name}-docker.pkg.dev/${gcp.project.id}/${gcp.repository.name}/${gcp.custom-keycloak-configurer.image.name}</gcp.custom-keycloak-configurer.image.tag>
+        <gcp.custom-keycloak-themes.image.name>custom-keycloak-themes-docker-image</gcp.custom-keycloak-themes.image.name>
+        <gcp.custom-keycloak-themes.image.tag>${gcp.region.name}-docker.pkg.dev/${gcp.project.id}/${gcp.repository.name}/${gcp.custom-keycloak-themes.image.name}</gcp.custom-keycloak-themes.image.tag>
+        <gcp.gke-topology-helper.image.name>gke-topology-helper-docker-image</gcp.gke-topology-helper.image.name>
+        <gcp.gke-topology-helper.image.tag>${gcp.region.name}-docker.pkg.dev/${gcp.project.id}/${gcp.repository.name}/${gcp.gke-topology-helper.image.name}</gcp.gke-topology-helper.image.tag>
+        <gcp.infinispan.image.name>custom-infinispan-docker-image</gcp.infinispan.image.name>
+        <gcp.infinispan.image.tag>${gcp.region.name}-docker.pkg.dev/${gcp.project.id}/${gcp.repository.name}/${gcp.infinispan.image.name}</gcp.infinispan.image.tag>
+        <gcp.keycloak.image.name>custom-keycloak-docker-image</gcp.keycloak.image.name>
+        <gcp.keycloak.image.tag>${gcp.region.name}-docker.pkg.dev/${gcp.project.id}/${gcp.repository.name}/${gcp.keycloak.image.name}</gcp.keycloak.image.tag>
+
+        <kubernetes.namespace>keycloak</kubernetes.namespace>
+
+        <!-- These values would be provided by a Vault or shared config map-->
+        <postgres.database.name>ps_db</postgres.database.name>
+        <postgres.database.username>ps_user</postgres.database.username>
+        <postgres.database.password>password</postgres.database.password>
+        <infinispan.keycloak.realm>default</infinispan.keycloak.realm>
+        <infinispan.keycloak.username>keycloak</infinispan.keycloak.username>
+        <infinispan.keycloak.password>password</infinispan.keycloak.password>
+        <infinispan.monitor.username>monitor</infinispan.monitor.username>
+        <infinispan.monitor.password>password</infinispan.monitor.password>
+        <infinispan.developer.username>developer</infinispan.developer.username>
+        <infinispan.developer.password>password</infinispan.developer.password>
+        <infinispan.observer.username>observer</infinispan.observer.username>
+        <infinispan.observer.password>password</infinispan.observer.password>
+        <keycloak.admin.username>admin</keycloak.admin.username>
+        <keycloak.admin.password>admin</keycloak.admin.password>
+        <master.keycloak.google.client.id>581288541933-893v0v6alvl8au5apk12ldrf9b241s4e.apps.googleusercontent.com</master.keycloak.google.client.id>
+        <master.keycloak.google.client.secret>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</master.keycloak.google.client.secret>
+
+        <keycloak.host>keycloak.paulhowells.dev</keycloak.host>
+        <infinispan.host>infinispan.paulhowells.dev</infinispan.host>
+    </properties>
+
+</project>

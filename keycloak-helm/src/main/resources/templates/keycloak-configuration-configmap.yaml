@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-configuration-configmap
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: keycloak-configuration-configmap
+binaryData:
+  {{ range $path, $_ :=  .Files.Glob  "keycloak-config/**" }}
+  {{- $name := base $path }}
+  {{- sha256sum (printf "%s/%s" (index (regexSplit "keycloak-config" (dir $path) -1) 1 ) $name ) | indent 2 }}{{ print ": "}}{{ $.Files.Get $path | replace "\r\n" "\n" | b64enc }}
+  {{ end }}

@@ -1,0 +1,10 @@
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: keycloak-infinispan-managed-cert
+  namespace: {{ .Release.Namespace }}
+spec:
+  domains:
+    - infinispan.paulhowells.dev
+    - keycloak.paulhowells.dev

@@ -1,0 +1,21 @@
+---
+clients:
+  - realmName: "app-realm"
+    clientId: "app-admin-ui"
+    grantTypes:
+      authorizationCode:
+        enabled: true
+        postLoginRedirectUris:
+          - "https://redirect.com"
+        webOrigins:
+          - "app.com"
+        postLogoutRedirectUris:
+          - "+"
+        flowOverride: "browser"
+    advancedSettings:
+      accessTokenLifespanSeconds: 300
+      clientSessionIdleTimeoutSeconds: 1200
+      clientSessionMaxLifespanSeconds: 7200
+      clientOfflineSessionIdleTimeoutSeconds: 86400
+      clientOfflineSessionMaxLifespanSeconds: 604800
+    enabled: true

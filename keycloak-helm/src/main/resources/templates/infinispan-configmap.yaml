@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: infinispan-configmap
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: infinispan-configmap
+data:
+  infinispan.yml: |-
+    {{- include "infinispan.yml" . | nindent 4 }}
+  log4j2.xml: |-
+    {{- include "infinispan-log4j2.xml" . | nindent 4 }}

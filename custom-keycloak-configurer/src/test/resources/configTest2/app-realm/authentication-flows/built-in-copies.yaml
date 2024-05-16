@@ -1,0 +1,26 @@
+---
+authenticationFlows:
+  - realmName: "app-realm"
+    alias: "Copy of browser"
+    description: "browser based authentication"
+    providerId: "basic-flow"
+    executions:
+      - !<authenticator>
+        providerId: "auth-cookie"
+        displayName: "Cookie"
+        requirement: "ALTERNATIVE"
+        config: {}
+        type: "authenticator"
+      - !<flow>
+        providerId: "basic-flow"
+        displayName: "Copy of browser forms"
+        requirement: "ALTERNATIVE"
+        description: "Username, password, otp and other auth forms."
+        executions:
+          - !<authenticator>
+            providerId: "auth-username-password-form"
+            displayName: "Username Password Form"
+            requirement: "REQUIRED"
+            config: {}
+            type: "authenticator"
+        type: "flow"

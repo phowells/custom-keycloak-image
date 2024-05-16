@@ -1,0 +1,26 @@
+---
+realms:
+  - realmName: "master"
+    enabled: true
+    googleIdentityProvider:
+      clientId: "notarealvalue"
+      clientSecret: "notarealvalue"
+      displayOrder: null
+      hostedDomains: []
+      useUserIpParam: false
+      requestRefreshToken: true
+      scopes: []
+      storeTokens: false
+      acceptsPromptNoneForward: false
+      disableUserInfo: false
+      trustEmail: true
+      accountLinkingOnly: false
+      hideOnLoginPage: false
+      essentialClaim:
+        enabled: false
+        claimName: null
+        regex: null
+      firstLoginFlowAlias: "first broker login"
+      postLoginFlowAlias: null
+      syncMode: "IMPORT"
+      enabled: false

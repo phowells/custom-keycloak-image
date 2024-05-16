@@ -1,0 +1,74 @@
+gcp:
+  projectId: ${gcp.project.id}
+  regionName: ${gcp.region.name}
+  repositoryName: ${gcp.repository.name}
+
+ingress:
+  globalStaticIpName: keycloak-infinispan-ip
+  keycloakHost: ${keycloak.host}
+  infinispanHost: ${infinispan.host}
+
+keycloak:
+  imageTag: ${gcp.keycloak.image.tag}:latest
+  initContainers:
+    themesContainer:
+      imageTag: ${gcp.custom-keycloak-themes.image.tag}:latest
+  # Single Replica to simplify finding stuff in the logs
+  replicas: 1
+  nodePoolName: default-pool
+  clusterDomain: cluster.local
+  database:
+    clusterDomain: cluster.local
+    name: ${postgres.database.name}
+    username: ${postgres.database.username}
+    password: ${postgres.database.password}
+  infinispan:
+    clusterDomain: cluster.local
+    realm: ${infinispan.keycloak.realm}
+    username: ${infinispan.keycloak.username}
+    password: ${infinispan.keycloak.password}
+  admin:
+    username: ${keycloak.admin.username}
+    password: ${keycloak.admin.password}
+  logLevel: DEBUG
+
+keycloakConfigurer:
+  imageTag: ${gcp.custom-keycloak-configurer.image.tag}:latest
+  # TODO We should look at using the internal domain instead of the ingress.  This may help the job succeed faster.
+#  keycloakUrl: https://${keycloak.host}
+  keycloak:
+    clusterDomain: cluster.local
+
+infinispan:
+  imageTag: ${gcp.infinispan.image.tag}:latest
+  initContainers:
+    dataChmodPv:
+      imageTag: registry.access.redhat.com/ubi8-micro
+    gkeTopologyHelper:
+      imageTag: ${gcp.gke-topology-helper.image.tag}:latest
+  replicas: 4
+  nodePoolName: infinispan-pool
+  clusterDomain: cluster.local
+  clusterName: keycloak-cluster
+  logging:
+    categories:
+    # No need to warn about not being able to TLS/SSL handshake
+  #      - category: io.netty.handler.ssl.ApplicationProtocolNegotiationHandler
+  #        level: error
+  container:
+    storage:
+      size: 1Gi
+      storageClassName: ""
+      # Set `ephemeral: true` to delete all persisted data when clusters shut down or restart.
+      ephemeral: true
+    resources:
+      # Specify the CPU limit and the memory limit for each pod.
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      # Specify the maximum CPU requests and the maximum memory requests for each pod.
+      requests:
+        cpu: 500m
+        memory: 512Mi
+  config:
+    distributedCacheOwners: 2
