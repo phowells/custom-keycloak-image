@@ -1,0 +1,18 @@
+---
+clients:
+  - realmName: "app-realm"
+    clientId: "app-admin-api"
+    clientSecret: "password"
+    grantTypes:
+      password:
+        enabled: true
+        flowOverride: "direct grant"
+      clientCredentials:
+        enabled: true
+    advancedSettings:
+      accessTokenLifespanSeconds: 300
+      clientSessionIdleTimeoutSeconds: 1200
+      clientSessionMaxLifespanSeconds: 7200
+      clientOfflineSessionIdleTimeoutSeconds: 86400
+      clientOfflineSessionMaxLifespanSeconds: 604800
+    enabled: true

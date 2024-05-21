@@ -1,0 +1,309 @@
+---
+authenticationFlows:
+  - realmName: "app-realm"
+    alias: "Copy of browser"
+    description: "browser based authentication"
+    providerId: "basic-flow"
+    executions:
+      - !<authenticator>
+        providerId: "auth-cookie"
+        displayName: "Cookie"
+        requirement: "ALTERNATIVE"
+        config: {}
+        type: "authenticator"
+      - !<authenticator>
+        providerId: "auth-spnego"
+        displayName: "Kerberos"
+        requirement: "DISABLED"
+        config: {}
+        type: "authenticator"
+      - !<authenticator>
+        providerId: "identity-provider-redirector"
+        displayName: "Identity Provider Redirector"
+        requirement: "ALTERNATIVE"
+        config:
+          name: "Copy of browser Config Name"
+          defaultProvider: "facebook"
+        type: "authenticator"
+      - !<flow>
+        providerId: "basic-flow"
+        displayName: "Copy of browser forms"
+        requirement: "ALTERNATIVE"
+        description: "Username, password, otp and other auth forms."
+        executions:
+          - !<authenticator>
+            providerId: "auth-username-password-form"
+            displayName: "Username Password Form"
+            requirement: "REQUIRED"
+            config: {}
+            type: "authenticator"
+          - !<flow>
+            providerId: "basic-flow"
+            displayName: "Copy of browser Browser - Conditional OTP"
+            requirement: "CONDITIONAL"
+            description: "Flow to determine if the OTP is required for the authentication"
+            executions:
+              - !<authenticator>
+                providerId: "conditional-user-configured"
+                displayName: "Condition - user configured"
+                requirement: "REQUIRED"
+                config: {}
+                type: "authenticator"
+              - !<authenticator>
+                providerId: "auth-otp-form"
+                displayName: "OTP Form"
+                requirement: "REQUIRED"
+                config: {}
+                type: "authenticator"
+            type: "flow"
+        type: "flow"
+  - realmName: "app-realm"
+    alias: "Copy of clients"
+    description: "Base authentication for clients"
+    providerId: "client-flow"
+    executions:
+      - !<authenticator>
+        providerId: "client-secret"
+        displayName: "Client Id and Secret"
+        requirement: "ALTERNATIVE"
+        config: {}
+        type: "authenticator"
+      - !<authenticator>
+        providerId: "client-jwt"
+        displayName: "Signed Jwt"
+        requirement: "ALTERNATIVE"
+        config: {}
+        type: "authenticator"
+      - !<authenticator>
+        providerId: "client-secret-jwt"
+        displayName: "Signed Jwt with Client Secret"
+        requirement: "ALTERNATIVE"
+        config: {}
+        type: "authenticator"
+      - !<authenticator>
+        providerId: "client-x509"
+        displayName: "X509 Certificate"
+        requirement: "ALTERNATIVE"
+        config: {}
+        type: "authenticator"
+  - realmName: "app-realm"
+    alias: "Copy of direct grant"
+    description: "OpenID Connect Resource Owner Grant"
+    providerId: "basic-flow"
+    executions:
+      - !<authenticator>
+        providerId: "direct-grant-validate-username"
+        displayName: "Username Validation"
+        requirement: "REQUIRED"
+        config: {}
+        type: "authenticator"
+      - !<authenticator>
+        providerId: "direct-grant-validate-password"
+        displayName: "Password"
+        requirement: "REQUIRED"
+        config: {}
+        type: "authenticator"
+      - !<flow>
+        providerId: "basic-flow"
+        displayName: "Copy of direct grant Direct Grant - Conditional OTP"
+        requirement: "CONDITIONAL"
+        description: "Flow to determine if the OTP is required for the authentication"
+        executions:
+          - !<authenticator>
+            providerId: "conditional-user-configured"
+            displayName: "Condition - user configured"
+            requirement: "REQUIRED"
+            config: {}
+            type: "authenticator"
+          - !<authenticator>
+            providerId: "direct-grant-validate-otp"
+            displayName: "OTP"
+            requirement: "REQUIRED"
+            config: {}
+            type: "authenticator"
+        type: "flow"
+  - realmName: "app-realm"
+    alias: "Copy of docker auth"
+    description: "Used by Docker clients to authenticate against the IDP"
+    providerId: "basic-flow"
+    executions:
+      - !<authenticator>
+        providerId: "docker-http-basic-authenticator"
+        displayName: "Docker Authenticator"
+        requirement: "REQUIRED"
+        config: {}
+        type: "authenticator"
+  - realmName: "app-realm"
+    alias: "Copy of registration"
+    description: "registration flow"
+    providerId: "basic-flow"
+    executions:
+      - !<flow>
+        providerId: "form-flow"
+        displayName: "Copy of registration registration form"
+        requirement: "REQUIRED"
+        description: "registration form"
+        executions:
+          - !<authenticator>
+            providerId: "registration-user-creation"
+            displayName: "Registration User Creation"
+            requirement: "REQUIRED"
+            config: {}
+            type: "authenticator"
+          - !<authenticator>
+            providerId: "registration-profile-action"
+            displayName: "Profile Validation"
+            requirement: "REQUIRED"
+            config: {}
+            type: "authenticator"
+          - !<authenticator>
+            providerId: "registration-password-action"
+            displayName: "Password Validation"
+            requirement: "REQUIRED"
+            config: {}
+            type: "authenticator"
+          - !<authenticator>
+            providerId: "registration-recaptcha-action"
+            displayName: "Recaptcha"
+            requirement: "DISABLED"
+            config: {}
+            type: "authenticator"
+          - !<authenticator>
+            providerId: "registration-terms-and-conditions"
+            displayName: "Terms and conditions"
+            requirement: "DISABLED"
+            config: {}
+            type: "authenticator"
+        type: "flow"
+  - realmName: "app-realm"
+    alias: "Copy of reset credentials"
+    description: "Reset credentials for a user if they forgot their password or something"
+    providerId: "basic-flow"
+    executions:
+      - !<authenticator>
+        providerId: "reset-credentials-choose-user"
+        displayName: "Choose User"
+        requirement: "REQUIRED"
+        config: {}
+        type: "authenticator"
+      - !<authenticator>
+        providerId: "reset-credential-email"
+        displayName: "Send Reset Email"
+        requirement: "REQUIRED"
+        config: {}
+        type: "authenticator"
+      - !<authenticator>
+        providerId: "reset-password"
+        displayName: "Reset Password"
+        requirement: "REQUIRED"
+        config: {}
+        type: "authenticator"
+      - !<flow>
+        providerId: "basic-flow"
+        displayName: "Copy of reset credentials Reset - Conditional OTP"
+        requirement: "CONDITIONAL"
+        description: "Flow to determine if the OTP should be reset or not. Set to REQUIRED\
+      \ to force."
+        executions:
+          - !<authenticator>
+            providerId: "conditional-user-configured"
+            displayName: "Condition - user configured"
+            requirement: "REQUIRED"
+            config: {}
+            type: "authenticator"
+          - !<authenticator>
+            providerId: "reset-otp"
+            displayName: "Reset OTP"
+            requirement: "REQUIRED"
+            config: {}
+            type: "authenticator"
+        type: "flow"
+  - realmName: "app-realm"
+    alias: "Copy of first broker login"
+    description: "Actions taken after first broker login with identity provider account,\
+    \ which is not yet linked to any Keycloak account"
+    providerId: "basic-flow"
+    executions:
+      - !<authenticator>
+        providerId: "idp-review-profile"
+        displayName: "Review Profile"
+        requirement: "REQUIRED"
+        config:
+          update.profile.on.first.login: "missing"
+          name: "Copy of first broker login review profile config"
+        type: "authenticator"
+      - !<flow>
+        providerId: "basic-flow"
+        displayName: "Copy of first broker login User creation or linking"
+        requirement: "REQUIRED"
+        description: "Flow for the existing/non-existing user alternatives"
+        executions:
+          - !<authenticator>
+            providerId: "idp-create-user-if-unique"
+            displayName: "Create User If Unique"
+            requirement: "ALTERNATIVE"
+            config:
+              name: "Copy of first broker login create unique user config"
+              require.password.update.after.registration: "false"
+            type: "authenticator"
+          - !<flow>
+            providerId: "basic-flow"
+            displayName: "Copy of first broker login Handle Existing Account"
+            requirement: "ALTERNATIVE"
+            description: "Handle what to do if there is existing account with same email/username\
+        \ like authenticated identity provider"
+            executions:
+              - !<authenticator>
+                providerId: "idp-confirm-link"
+                displayName: "Confirm link existing account"
+                requirement: "REQUIRED"
+                config: {}
+                type: "authenticator"
+              - !<flow>
+                providerId: "basic-flow"
+                displayName: "Copy of first broker login Account verification options"
+                requirement: "REQUIRED"
+                description: "Method with which to verity the existing account"
+                executions:
+                  - !<authenticator>
+                    providerId: "idp-email-verification"
+                    displayName: "Verify existing account by Email"
+                    requirement: "ALTERNATIVE"
+                    config: {}
+                    type: "authenticator"
+                  - !<flow>
+                    providerId: "basic-flow"
+                    displayName: "Copy of first broker login Verify Existing Account by Re-authentication"
+                    requirement: "ALTERNATIVE"
+                    description: "Reauthentication of existing account"
+                    executions:
+                      - !<authenticator>
+                        providerId: "idp-username-password-form"
+                        displayName: "Username Password Form for identity provider reauthentication"
+                        requirement: "REQUIRED"
+                        config: {}
+                        type: "authenticator"
+                      - !<flow>
+                        providerId: "basic-flow"
+                        displayName: "Copy of first broker login First broker login - Conditional\
+              \ OTP"
+                        requirement: "CONDITIONAL"
+                        description: "Flow to determine if the OTP is required for the authentication"
+                        executions:
+                          - !<authenticator>
+                            providerId: "conditional-user-configured"
+                            displayName: "Condition - user configured"
+                            requirement: "REQUIRED"
+                            config: {}
+                            type: "authenticator"
+                          - !<authenticator>
+                            providerId: "auth-otp-form"
+                            displayName: "OTP Form"
+                            requirement: "REQUIRED"
+                            config: {}
+                            type: "authenticator"
+                        type: "flow"
+                    type: "flow"
+                type: "flow"
+            type: "flow"
+        type: "flow"

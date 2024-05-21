@@ -1,0 +1,8 @@
+postgres:
+  imageTag: postgres:14
+  # Single Replica so we do not need to set up replication
+  replicas: 1
+  nodePoolName: default-pool
+  databaseName: ${postgres.database.name}
+  databaseUsername: ${postgres.database.username}
+  databasePassword: ${postgres.database.password}

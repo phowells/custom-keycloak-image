@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-deployment
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: keycloak-deployment
+spec:
+  replicas: {{ .Values.keycloak.replicas }}
+  selector:
+    matchLabels:
+      app: keycloak-deployment
+
+  template:
+    metadata:
+      labels:
+        app: keycloak-deployment
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        runAsUser: 10000
+      initContainers:
+        - name: keycloak-themes-container
+          image: {{ .Values.keycloak.initContainers.themesContainer.imageTag }}
+          command: ["/bin/sh", "-c", "cp -r /themes /opt/keycloak/"]
+          volumeMounts:
+            - name: themes-volume
+              mountPath: /opt/keycloak/themes
+      containers:
+        - name: keycloak-container
+          image: {{ .Values.keycloak.imageTag }}
+          imagePullPolicy: Always
+          # Start in production mode using the pre-optimized configuration specified during image creation
+          args:
+            - start
+            - --optimized
+            # Find the other Keycloak pods using the PING service
+            - -Djgroups.dns.query={{ printf "keycloak-jgroups-ping.%s.svc.%s" .Release.Namespace .Values.keycloak.clusterDomain }}
+          envFrom:
+            - configMapRef:
+                name: keycloak-configmap
+            - secretRef:
+                name: keycloak-secret
+          ports:
+            # Cluster discovery for Keycloak pods
+            - name: ispn-ping-port
+              containerPort: 7800
+              protocol: TCP
+            # Keycloak endpoints (OIDC, Console, and REST API)
+            - name: kc-http-port
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /realms/master
+              port: 8080
+          volumeMounts:
+            - name: themes-volume
+              mountPath: /opt/keycloak/themes
+      nodeSelector:
+        cloud.google.com/gke-nodepool: {{ .Values.keycloak.nodePoolName }}
+      volumes:
+        - name: themes-volume
+          emptyDir: { }

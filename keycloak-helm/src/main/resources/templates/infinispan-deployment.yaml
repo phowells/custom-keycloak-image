@@ -1,0 +1,183 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infinispan-deployment
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: infinispan-deployment
+spec:
+  replicas: {{ .Values.infinispan.replicas }}
+  selector:
+    matchLabels:
+      app: infinispan-deployment
+      clusterName: {{ .Values.infinispan.clusterName }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/infinispan-configmap.yaml") . | sha256sum }}
+        checksum/identities: {{ include (print $.Template.BasePath "/infinispan-identities-batch-secret.yaml") . | sha256sum }}
+      labels:
+        app: infinispan-deployment
+        clusterName: {{ .Values.infinispan.clusterName }}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        runAsUser: 10000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: infinispan-deployment
+                    clusterName: {{ .Values.infinispan.clusterName }}
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      initContainers:
+        # Set the region/zone arguments
+        - name: gke-topology-helper
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          image: {{ .Values.infinispan.initContainers.gkeTopologyHelper.imageTag }}
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "0.1"
+              memory: 512Mi
+            requests:
+              cpu: "0.1"
+              memory: 512Mi
+          volumeMounts:
+            - name: gke-args-volume
+              mountPath: /opt/infinispan/etc/gke-args
+      containers:
+        - name: infinispan-container
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          image: {{ .Values.infinispan.imageTag }}
+          imagePullPolicy: Always
+          # These are the arguments sent to the image on start-up
+          args:
+            # Set the location of the Infinispan config file
+            - --server-config=/etc/config/infinispan.yml
+            # Set the location of the Log4j2 file
+            - --logging-config=/etc/config/log4j2.xml
+            # Find the other Infinispan pods using the PING service
+            - -Djgroups.dns.query={{ printf "infinispan-service-ping.%s.svc.%s" .Release.Namespace .Values.infinispan.clusterDomain }}
+            # Set the cluster name
+            - -Dinfinispan.cluster.name={{ .Values.infinispan.clusterName }}
+            # Set an argument for the pod name using the environment variable
+            - "-Dgke.pod.name=$(MY_POD_NAME)"
+          env:
+            # Set the location of the Identities batch file
+            - name: IDENTITIES_BATCH
+              value: /etc/security/identities-batch
+            # Set an environment variable with the Pod name from the kubernetes metadata
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          ports:
+            # Cluster discovery for Infinispan pods
+            - name: ispn-ping-port
+              containerPort: 8888
+              protocol: TCP
+            # Infinispan endpoints (Console and REST API)
+            - name: ispn-http-port
+              containerPort: 11222
+              protocol: TCP
+            # Infinispan Metrics Endpoint
+            - name: ispn-met-port
+              containerPort: 11223
+              protocol: TCP
+          startupProbe:
+            failureThreshold: 90
+            httpGet:
+              # The cache-manager health endpoint has been deprecated in favour of the container health endpoint
+              # The container health endpoint requires authentication but K8s does not support authentication on the probes
+              # We may be able to configure are probe user and set a header with the basic credentials to get it working
+              #              path: /rest/v2/container/health
+              path: /rest/v2/cache-managers/default/health/status
+              port: 11222
+              scheme: HTTP
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              #              path: /rest/v2/container/health
+              path: /rest/v2/cache-managers/default/health/status
+              port: 11222
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            # Google GCE Load Balancer will not initialize if timeout is not less than the period
+            timeoutSeconds: 5
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+#              path: /rest/v2/container/health
+              path: /rest/v2/cache-managers/default/health/status
+              port: 11222
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: {{ .Values.infinispan.container.resources.limits.cpu }}
+              memory: {{ .Values.infinispan.container.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.infinispan.container.resources.requests.cpu }}
+              memory: {{ .Values.infinispan.container.resources.requests.memory }}
+          volumeMounts:
+            - name: gke-args-volume
+              mountPath: /opt/infinispan/etc/gke-args
+            - name: config-volume
+              mountPath: /etc/config
+            - name: identities-volume
+              mountPath: /etc/security
+            - name: ispn-server-conf-volume
+              mountPath: /opt/infinispan/server/conf
+            - name: ispn-server-data-volume
+              mountPath: /opt/infinispan/server/data
+            - name: ispn-server-log-volume
+              mountPath: /opt/infinispan/server/log
+            - name: redhat-insights-volume
+              mountPath: /var/tmp/insights-runtimes
+      nodeSelector:
+        cloud.google.com/gke-nodepool: {{ .Values.infinispan.nodePoolName }}
+      volumes:
+        - name: gke-args-volume
+          emptyDir: { }
+        - name: config-volume
+          configMap:
+            name: infinispan-configmap
+        - name: identities-volume
+          secret:
+            secretName: infinispan-identities-batch-secret
+        - name: ispn-server-conf-volume
+          emptyDir: { }
+        - name: ispn-server-data-volume
+          emptyDir: { }
+        - name: ispn-server-log-volume
+          emptyDir: { }
+        - name: redhat-insights-volume
+          emptyDir: { }
+

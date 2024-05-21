@@ -1,0 +1,4 @@
+---
+realms:
+  - realmName: "app-realm"
+    enabled: true

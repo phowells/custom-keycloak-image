@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-secret
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: {{ .Values.postgres.databaseName }}
+  POSTGRES_USER: {{ .Values.postgres.databaseUsername }}
+  POSTGRES_PASSWORD: {{ .Values.postgres.databasePassword }}

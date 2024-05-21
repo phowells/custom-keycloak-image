@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycloak-configurer-job
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: keycloak-configurer-job
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+spec:
+  template:
+    metadata:
+      labels:
+        app: keycloak-configurer-job
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        runAsUser: 10000
+      restartPolicy: Never
+      containers:
+        - name: keycloak-configurer-container
+          image:  {{ .Values.keycloakConfigurer.imageTag }}
+          env:
+            - name: KEYCLOAK_CONFIG_DIRECTORY
+              value: /etc/config/keycloak-config
+            - name: KEYCLOAK_URL
+#              value: {{ .Values.keycloakConfigurer.keycloakUrl }}
+              value: http://{{ printf "keycloak-service-http.%s.svc.%s" .Release.Namespace .Values.keycloakConfigurer.keycloak.clusterDomain }}:8080
+          envFrom:
+            - secretRef:
+                name: keycloak-configurer-job-secret
+          volumeMounts:
+            {{ range $path, $bytes := .Files.Glob ( printf "keycloak-config/**") }}
+              {{ $name := base $path }}
+              - name: config-volume
+                mountPath: {{ printf "/etc/config/keycloak-config/%s/%s" (index (regexSplit "keycloak-config" (dir $path) -1) 1) $name | indent 2 }}
+                subPath: {{- sha256sum (printf "%s/%s" (index (regexSplit "keycloak-config" (dir $path) -1) 1 ) $name ) | indent 2 }}
+              {{ end }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: keycloak-configuration-configmap

@@ -1,0 +1,64 @@
+---
+realms:
+  - realmName: "app-realm"
+    defaultBrowserFlowAlias: "browser"
+    defaultRegistrationFlowAlias: "registration"
+    defaultDirectGrantFlowAlias: "direct grant"
+    defaultResetCredentialsFlowAlias: "reset credentials"
+    defaultClientAuthenticationFlowAlias: "clients"
+    enabled: true
+    generalSettings:
+      userManagedAccessAllowed: false
+    loginSettings:
+      registrationAllowed: false
+      registrationEmailAsUsername: false
+      rememberMe: true
+      verifyEmail: false
+      loginWithEmailAllowed: false
+      duplicateEmailsAllowed: false
+      resetPasswordAllowed: true
+      editUsernameAllowed: false
+    roles:
+      app-admin:
+          description: "An app-admin user"
+    scopes:
+      app-default:
+        type: default
+        description: Default scope for all app clients
+        protocol: openid-connect
+        includeInTokenScope: true
+        displayOnConsentScreen: false
+        consentScreenText:
+        mappers:
+          audience:
+            protocol: openid-connect
+            protocolMapper: oidc-audience-mapper
+            consentRequired: false
+            config:
+              "included.client.audience": "app-api"
+              "introspection.token.claim": "true"
+              "access.token.claim": "true"
+          roles:
+            protocol: openid-connect
+            protocolMapper: oidc-usermodel-realm-role-mapper
+            consentRequired: false
+            config:
+              "claim.name": "roles"
+              "multivalued": "true"
+              "jsonType.label": "String"
+              "introspection.token.claim": "true"
+              "access.token.claim": "true"
+      app-optional:
+        type: optional
+        description: Default scope for all app clients
+        protocol: openid-connect
+        includeInTokenScope: true
+        displayOnConsentScreen: false
+        consentScreenText:
+      app-none:
+        type: none
+        description: Default scope for all app clients
+        protocol: openid-connect
+        includeInTokenScope: true
+        displayOnConsentScreen: false
+        consentScreenText:

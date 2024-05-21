@@ -1,0 +1,73 @@
+---
+realms:
+  - realmName: "master"
+    defaultBrowserFlowAlias: "browser"
+    defaultRegistrationFlowAlias: "registration"
+    defaultDirectGrantFlowAlias: "direct grant"
+    defaultResetCredentialsFlowAlias: "reset credentials"
+    defaultClientAuthenticationFlowAlias: "clients"
+    enabled: true
+    generalSettings:
+      userManagedAccessAllowed: false
+    loginSettings:
+      registrationAllowed: false
+      registrationEmailAsUsername: false
+      rememberMe: true
+      verifyEmail: false
+      loginWithEmailAllowed: false
+      duplicateEmailsAllowed: false
+      resetPasswordAllowed: true
+      editUsernameAllowed: false
+    sessionSettings:
+      ssoSessionIdleTimeoutSeconds: 1800
+      ssoSessionMaxLifespanSeconds: 36000
+      ssoSessionIdleTimeoutRememberMeSeconds: 0
+      ssoSessionMaxLifespanRememberMeSeconds: 0
+      clientSessionIdleTimeoutSeconds: 0
+      clientSessionMaxLifespanSeconds: 0
+      offlineSessionIdleTimeoutSeconds: 2592000
+      offlineSessionMaxLifespanEnabled: false
+      offlineSessionMaxLifespanSeconds: 5184000
+      accessCodeLifespanLoginSeconds: 2640
+      accessCodeLifespanUserActionSeconds: 300
+    tokenSettings:
+      revokeRefreshToken: true
+      refreshTokenMaxReuse: 0
+      accessTokenLifespanSeconds: 60
+      clientLoginTimeoutSeconds: 60
+      actionTokenGeneratedByUserLifespanSeconds: 300
+      actionTokenGeneratedByAdminLifespanSeconds: 43200
+    googleIdentityProvider:
+      clientId: ${master.keycloak.google.client.id}
+      clientSecret: ${master.keycloak.google.client.secret}
+      displayOrder: null
+      hostedDomains: []
+      useUserIpParam: false
+      requestRefreshToken: true
+      scopes: []
+      storeTokens: false
+      acceptsPromptNoneForward: false
+      disableUserInfo: false
+      trustEmail: true
+      accountLinkingOnly: false
+      hideOnLoginPage: false
+      essentialClaim:
+        enabled: false
+        claimName: null
+        regex: null
+      firstLoginFlowAlias: "first broker login"
+      postLoginFlowAlias: null
+      syncMode: "IMPORT"
+      enabled: true
+      mappers:
+        - name: "Hard Coded Admin Grant"
+          identityProviderMapper: "oidc-hardcoded-role-idp-mapper"
+          config:
+            syncMode: "INHERIT"
+            role: "admin"
+    passwordPolicy:
+      minimumLength: 12
+      digits: 1
+      specialCharacters: 1
+      uppercase: 1
+      lowercase: 1

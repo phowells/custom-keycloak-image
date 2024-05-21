@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-configmap
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: keycloak-configmap
+data:
+  # We will use the x-forwarded headers to support White Label domains
+  KC_HOSTNAME_STRICT: "false"
+  # Enables communication through HTTP between the proxy and Red Hat build of Keycloak. This mode is suitable for
+  # deployments with a highly secure internal network where the reverse proxy keeps a secure connection (HTTP over TLS)
+  # with clients while communicating with Red Hat build of Keycloak using HTTP.
+  KC_PROXY: "edge"
+  # Enable parsing of the X-Forwarded-* headers
+  KC_PROXY_HEADERS: "xforwarded"
+  # Use the Postgres database for persistence
+  KC_DB: "postgres"
+  KC_DB_URL: jdbc:postgresql://{{ printf "postgres-service.%s.svc.%s" .Release.Namespace .Values.keycloak.database.clusterDomain }}:5432/{{ .Values.keycloak.database.name }}
+  # Enable the health check endpoint
+  KC_HEALTH_ENABLED: "true"
+  # Enable the metrics endpoint
+  KC_METRICS_ENABLED: "true"
+  # Configure Keycloak to use Infinispan caching
+  KC_CACHE: "ispn"
+  KC_CACHE_CONFIG_FILE: "external-cache-ispn.xml"
+  # Configure Infinispan to use DNS PING for discovery
+  KC_CACHE_STACK: "kubernetes"
+  # Configuration for the remote Infinispan cache
+  KC_CACHE_REMOTE_STORE_HOST: {{ printf "infinispan-service-http.%s.svc.%s" .Release.Namespace .Values.keycloak.infinispan.clusterDomain }}
+  KC_CACHE_REMOTE_STORE_PORT: "11222"
+  KC_CACHE_REMOTE_STORE_REALM: {{ .Values.keycloak.infinispan.realm }}
+  # Set the log level
+  KC_LOG_LEVEL: {{ .Values.keycloak.logLevel }}
