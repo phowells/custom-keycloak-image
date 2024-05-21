@@ -50,7 +50,8 @@ infinispan:
   nodePoolName: infinispan-pool
   clusterDomain: cluster.local
   clusterName: keycloak-cluster
-  externalKubernetesSecretName: infinispan-secret
+  externalKubernetesSecret:
+    name: infinispan-secret
   logging:
     categories:
     # No need to warn about not being able to TLS/SSL handshake
