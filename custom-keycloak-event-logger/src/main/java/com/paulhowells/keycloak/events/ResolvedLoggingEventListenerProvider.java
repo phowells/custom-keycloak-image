@@ -171,15 +171,15 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
     }
 
     private String[] resolve(String realmId, String userId) {
-        _logger.infof("<resolve {} {}", realmId, userId);
+        _logger.infof("<resolve %s %s", realmId, userId);
 
         AtomicReference<String> realmName = new AtomicReference<>();
         AtomicReference<String> username = new AtomicReference<>();
 
         KeycloakModelUtils.runJobInTransaction(session.getKeycloakSessionFactory(), s -> {
-            _logger.infof("<lambda {} {}", realmId, userId);
+            _logger.infof("<lambda %s %s", realmId, userId);
             RealmModel realm = session.realms().getRealm(realmId);
-            _logger.infof("realm={}", realm);
+            _logger.infof("realm=%s", realm);
 
             if (realm != null) {
                 realmName.set(realm.getName());
@@ -194,7 +194,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
         });
 
         String[] result = new String[] {realmName.get(), username.get()};
-        _logger.infof(">resolve {} {}", result[0], result[1]);
+        _logger.infof(">resolve %s %s", result[0], result[1]);
         return result;
     }
 
