@@ -10,10 +10,12 @@ import org.keycloak.events.EventListenerProvider;
 import org.keycloak.events.EventListenerTransaction;
 import org.keycloak.events.admin.AdminEvent;
 import org.keycloak.models.*;
+import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.utils.StringUtil;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ResolvedLoggingEventListenerProvider implements EventListenerProvider {
 
@@ -64,39 +66,25 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
 
         if (logger.isEnabled(level)) {
 
+            String[] resolved = resolve(event.getRealmId(), event.getUserId());
+
+            String realmName = resolved[0];
+            String username = resolved[1];
+
             StringBuilder sb = new StringBuilder();
 
             sb.append("type=");
             sanitize(sb, event.getType().toString());
             sb.append(", realmId=");
             sanitize(sb, event.getRealmId());
-
-            RealmModel realmModel = session.realms().getRealm(event.getRealmId());
-            String username = null;
-
-            if (realmModel != null) {
-
-                sb.append(", realm=");
-                sanitize(sb, realmModel.getName());
-
-                UserModel userModel = session.users().getUserById(realmModel, event.getUserId());
-
-                if (userModel != null) {
-
-                    username = userModel.getUsername();
-                }
-            }
-
+            sb.append(", realm=");
+            sanitize(sb, realmName);
             sb.append(", clientId=");
             sanitize(sb, event.getClientId());
             sb.append(", userId=");
             sanitize(sb, event.getUserId());
-
-            if (username != null && !username.isBlank()) {
-                sb.append(", username=");
-                sanitize(sb, username);
-            }
-
+            sb.append(", username=");
+            sanitize(sb, username);
             sb.append(", ipAddress=");
             sanitize(sb, event.getIpAddress());
 
@@ -138,37 +126,27 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
         Logger.Level level = adminEvent.getError() != null ? errorLevel : successLevel;
 
         if (logger.isEnabled(level)) {
+
+            String[] resolved = resolve(adminEvent.getRealmId(), adminEvent.getAuthDetails().getUserId());
+
+            String realmName = resolved[0];
+            String username = resolved[1];
+
             StringBuilder sb = new StringBuilder();
 
             sb.append("operationType=");
             sanitize(sb, adminEvent.getOperationType().toString());
             sb.append(", realmId=");
             sanitize(sb, adminEvent.getAuthDetails().getRealmId());
-
-            RealmModel realmModel = session.getProvider(RealmProvider.class).getRealm(adminEvent.getRealmId());
-            String username = null;
-
-            if (realmModel != null) {
-                sb.append(", realm=");
-                sanitize(sb, realmModel.getName());
-
-                UserModel userModel = session.getProvider(UserProvider.class).getUserById(realmModel, adminEvent.getAuthDetails().getUserId());
-
-                if (userModel != null) {
-
-                    username = userModel.getUsername();
-                }
-            }
+            sb.append(", realm=");
+            sanitize(sb, realmName);
 
             sb.append(", clientId=");
             sanitize(sb, adminEvent.getAuthDetails().getClientId());
             sb.append(", userId=");
             sanitize(sb, adminEvent.getAuthDetails().getUserId());
-
-            if (username != null && !username.isBlank()) {
-                sb.append(", username=");
-                sanitize(sb, username);
-            }
+            sb.append(", username=");
+            sanitize(sb, username);
 
             sb.append(", ipAddress=");
             sanitize(sb, adminEvent.getAuthDetails().getIpAddress());
@@ -188,6 +166,22 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
 
             logger.log(logger.isTraceEnabled() ? Logger.Level.TRACE : level, sb.toString());
         }
+    }
+
+    private String[] resolve(String realmId, String userId) {
+
+        AtomicReference<String> realmName = new AtomicReference<>();
+        AtomicReference<String> username = new AtomicReference<>();
+
+        KeycloakModelUtils.runJobInTransaction(session.getKeycloakSessionFactory(), s -> {
+            RealmModel realm = session.realms().getRealm(realmId);
+
+            realmName.set(realm.getName());
+            UserModel user = s.users().getUserById(realm, userId);
+            username.set(user.getUsername());
+        });
+
+        return new String[] {realmName.get(), username.get()};
     }
 
     @Override
@@ -216,7 +210,5 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             }
             sb.append("]");
         }
-        
     }
-
 }
