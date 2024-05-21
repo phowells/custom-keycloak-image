@@ -13,6 +13,7 @@
         <module>custom-keycloak-configurer</module>
         <module>custom-keycloak-configurer-docker-image</module>
         <module>custom-keycloak-docker-image</module>
+        <module>custom-keycloak-event-logger</module>
         <module>custom-keycloak-google-iap-jwt-authenticator</module>
         <module>custom-keycloak-integration-tests</module>
         <module>custom-keycloak-saml2-bearer-authenticator</module>
@@ -20,13 +21,13 @@
         <module>custom-keycloak-themes-docker-image</module>
         <module>custom-keycloak-trusted-first-broker-login-authenticator</module>
         <module>custom-keycloak-username-identity-provider-redirect</module>
+        <module>external-secrets-helm</module>
         <module>gke-topology-helper-docker-image</module>
         <module>gke-topology-helper</module>
         <module>keycloak-helm</module>
         <module>managed-certificate-helm</module>
         <module>namespace-helm</module>
         <module>postgres-helm</module>
-        <module>external-secrets-helm</module>
     </modules>
 
     <properties>

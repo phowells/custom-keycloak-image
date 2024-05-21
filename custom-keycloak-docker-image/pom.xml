@@ -21,6 +21,11 @@
     <dependencies>
         <dependency>
             <groupId>com.paulhowells.keycloak</groupId>
+            <artifactId>custom-keycloak-event-logger</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.paulhowells.keycloak</groupId>
             <artifactId>custom-keycloak-username-identity-provider-redirect</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
