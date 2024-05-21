@@ -178,7 +178,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
 
         KeycloakModelUtils.runJobInTransaction(session.getKeycloakSessionFactory(), s -> {
             _logger.infof("<lambda %s %s", realmId, userId);
-            RealmModel realm = session.realms().getRealm(realmId);
+            RealmModel realm = s.realms().getRealm(realmId);
             _logger.infof("realm=%s", realm);
 
             if (realm != null) {
