@@ -25,9 +25,6 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
     private final Character quotes;
     private final EventListenerTransaction tx = new EventListenerTransaction(this::logAdminEvent, this::logEvent);
 
-    private final RealmProvider realmProvider;
-    private final UserProvider userProvider;
-
     public ResolvedLoggingEventListenerProvider(KeycloakSession session, Logger logger,
                                                 Logger.Level successLevel, Logger.Level errorLevel, Character quotes, boolean sanitize) {
         this.session = session;
@@ -37,8 +34,6 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
         this.sanitize = sanitize;
         this.quotes = quotes;
         this.session.getTransactionManager().enlistAfterCompletion(tx);
-        this.realmProvider = this.session.getProvider(RealmProvider.class);
-        this.userProvider = this.session.getProvider(UserProvider.class);
     }
 
     @Override
@@ -76,7 +71,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             sb.append(", realmId=");
             sanitize(sb, event.getRealmId());
 
-            RealmModel realmModel = realmProvider.getRealm(event.getRealmId());
+            RealmModel realmModel = session.realms().getRealm(event.getRealmId());
             String username = null;
 
             if (realmModel != null) {
@@ -84,7 +79,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
                 sb.append(", realm=");
                 sanitize(sb, realmModel.getName());
 
-                UserModel userModel = userProvider.getUserById(realmModel, event.getUserId());
+                UserModel userModel = session.users().getUserById(realmModel, event.getUserId());
 
                 if (userModel != null) {
 
