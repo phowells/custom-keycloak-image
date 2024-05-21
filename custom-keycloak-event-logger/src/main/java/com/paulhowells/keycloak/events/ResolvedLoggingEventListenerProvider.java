@@ -145,14 +145,14 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             sb.append(", realmId=");
             sanitize(sb, adminEvent.getAuthDetails().getRealmId());
 
-            RealmModel realmModel = realmProvider.getRealm(adminEvent.getRealmId());
+            RealmModel realmModel = session.realms().getRealm(adminEvent.getRealmId());
             String username = null;
 
             if (realmModel != null) {
                 sb.append(", realm=");
                 sanitize(sb, realmModel.getName());
 
-                UserModel userModel = userProvider.getUserById(realmModel, adminEvent.getAuthDetails().getUserId());
+                UserModel userModel = session.users().getUserById(realmModel, adminEvent.getAuthDetails().getUserId());
 
                 if (userModel != null) {
 
