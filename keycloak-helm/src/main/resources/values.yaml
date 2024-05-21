@@ -46,7 +46,7 @@ infinispan:
       imageTag: registry.access.redhat.com/ubi8-micro
     gkeTopologyHelper:
       imageTag: ${gcp.gke-topology-helper.image.tag}:latest
-  replicas: 1
+  replicas: 4
   nodePoolName: infinispan-pool
   clusterDomain: cluster.local
   clusterName: keycloak-cluster

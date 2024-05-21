@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ResolvedLoggingEventListenerProvider implements EventListenerProvider {
 
+    private static final Logger _logger = Logger.getLogger(ResolvedLoggingEventListenerProvider.class);
+
     private final KeycloakSession session;
     private final Logger logger;
     private final Logger.Level successLevel;
@@ -169,19 +171,31 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
     }
 
     private String[] resolve(String realmId, String userId) {
+        _logger.infof("<resolve {} {}", realmId, userId);
 
         AtomicReference<String> realmName = new AtomicReference<>();
         AtomicReference<String> username = new AtomicReference<>();
 
         KeycloakModelUtils.runJobInTransaction(session.getKeycloakSessionFactory(), s -> {
+            _logger.infof("<lambda {} {}", realmId, userId);
             RealmModel realm = session.realms().getRealm(realmId);
+            _logger.infof("realm={}", realm);
 
-            realmName.set(realm.getName());
-            UserModel user = s.users().getUserById(realm, userId);
-            username.set(user.getUsername());
+            if (realm != null) {
+                realmName.set(realm.getName());
+                UserModel user = s.users().getUserById(realm, userId);
+
+                if (user != null) {
+                    username.set(user.getUsername());
+                }
+            }
+
+            _logger.infof(">lambda");
         });
 
-        return new String[] {realmName.get(), username.get()};
+        String[] result = new String[] {realmName.get(), username.get()};
+        _logger.infof(">resolve {} {}", result[0], result[1]);
+        return result;
     }
 
     @Override
