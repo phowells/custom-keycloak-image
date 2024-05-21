@@ -30,7 +30,7 @@ keycloak:
   admin:
     username: ${keycloak.admin.username}
     password: ${keycloak.admin.password}
-  logLevel: INFO,org.keycloak.events=DEBUG
+  logLevel: INFO,org.keycloak.events:DEBUG
 
 keycloakConfigurer:
   imageTag: ${gcp.custom-keycloak-configurer.image.tag}:latest
