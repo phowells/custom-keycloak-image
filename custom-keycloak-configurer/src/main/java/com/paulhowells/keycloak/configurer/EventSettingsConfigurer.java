@@ -6,6 +6,8 @@ import com.paulhowells.keycloak.configurer.rest.client.model.EventsConfig;
 import com.paulhowells.keycloak.configurer.rest.client.model.Realm;
 import org.slf4j.Logger;
 
+import java.util.Collections;
+
 
 public class EventSettingsConfigurer {
 
@@ -80,6 +82,8 @@ public class EventSettingsConfigurer {
         }
         result.setUserEventsExpirationSeconds(userEventsExpirationSeconds);
 
+        // Sort the events because they are not returned in a deterministic order
+        Collections.sort(eventsConfig.getEnabledEventTypes());
         result.setEnabledEventTypes(eventsConfig.getEnabledEventTypes());
         result.setAdminEventsEnabled(Boolean.TRUE.equals(eventsConfig.getAdminEventsEnabled()));
         result.setAdminEventsDetailsEnabled(Boolean.TRUE.equals(eventsConfig.getAdminEventsDetailsEnabled()));

@@ -1,11 +1,15 @@
 package com.paulhowells.keycloak.configurer.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import org.slf4j.Logger;
 
+import java.util.Collections;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonDeserialize(converter= EventSettings.PostConstruct.class)
 public class EventSettings extends BaseDefinition {
 
     private List<String> eventsListeners;
@@ -91,4 +95,18 @@ public class EventSettings extends BaseDefinition {
     public void setAdminEventsExpirationSeconds(Integer adminEventsExpirationSeconds) {
         this.adminEventsExpirationSeconds = adminEventsExpirationSeconds;
     }
+
+    static class PostConstruct extends StdConverter<EventSettings, EventSettings> {
+
+        @Override
+        public EventSettings convert(EventSettings o) {
+
+            if (o.enabledEventTypes != null) {
+                Collections.sort(o.enabledEventTypes);
+            }
+
+            return o;
+        }
+    }
 }
+
