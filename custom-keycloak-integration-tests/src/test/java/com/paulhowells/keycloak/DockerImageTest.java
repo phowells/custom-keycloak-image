@@ -72,8 +72,10 @@ public class DockerImageTest {
         Pattern resolvedLoggerPattern = Pattern.compile("^DEBUG \\[org.keycloak.events\\].*operationType=\"([^\"]+)\".*realmId=\"([^\"]+)\".*realm=\"([^\"]+)\".*userId=\"([^\"]+)\".*userRealm=\"([^\"]+)\".*username=\"([^\"]+)\".*resourceType=\"([^\"]+)\".*resourcePath=\"([^\"]+)\".*$");
 
         List<String> auditLogs = keycloakLogs.stream().filter(log -> filterPattern.matcher(log).matches()).toList();
+        logger.debug("auditLogs="+auditLogs.size());
 
         List<String> resolvedLoggingEnabledLogs = auditLogs.stream().filter(log -> resolvedLoggingEnabledPattern.matcher(log).matches()).toList();
+        logger.debug("resolvedLoggingEnabledLogs="+resolvedLoggingEnabledLogs.size());
 
         assertFalse(resolvedLoggingEnabledLogs.isEmpty());
         String resolvedLoggingEnabledLog = resolvedLoggingEnabledLogs.get(0);
