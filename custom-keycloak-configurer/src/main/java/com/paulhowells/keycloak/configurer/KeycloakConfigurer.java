@@ -65,6 +65,7 @@ public class KeycloakConfigurer {
     }
 
     public static final String KEYCLOAK_CONFIG_DIRECTORY_ARG = "--config=";
+    public static final String KEYCLOAK_CONFIG_URL_ARG = "--keycloak-url=";
     public static final String KEYCLOAK_CONFIG_DIRECTORY_ENV_VARIABLE = "KEYCLOAK_CONFIG_DIRECTORY";
     public static final String KEYCLOAK_URL_ENV_VARIABLE = "KEYCLOAK_URL";
     public static final String MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE = "MASTER_REALM_ADMIN_USERNAME";
@@ -75,15 +76,21 @@ public class KeycloakConfigurer {
         logger.debug("<main");
 
         String configDirectory = null;
+        String keycloakUrl = null;
         for (String arg:args) {
             if (arg.startsWith(KEYCLOAK_CONFIG_DIRECTORY_ARG)) {
 
                 configDirectory = arg.substring(KEYCLOAK_CONFIG_DIRECTORY_ARG.length());
                 logger.info("{} '{}' Found config directory", KEYCLOAK_CONFIG_DIRECTORY_ARG, configDirectory);
             }
+            if (arg.startsWith(KEYCLOAK_CONFIG_URL_ARG)) {
+
+                keycloakUrl = arg.substring(KEYCLOAK_CONFIG_URL_ARG.length());
+                logger.info("{} '{}' Found keycloak URL", KEYCLOAK_CONFIG_URL_ARG, keycloakUrl);
+            }
         }
 
-        new KeycloakConfigurer().run(configDirectory);
+        new KeycloakConfigurer().run(configDirectory, keycloakUrl);
 
         logger.debug(">main");
     }
@@ -123,7 +130,7 @@ public class KeycloakConfigurer {
         return result;
     }
 
-    private void run(String configDirectory) throws IOException {
+    private void run(String configDirectory, String keycloakUrl) throws IOException {
         logger.debug("<run");
 
         boolean configValid = true;
@@ -136,12 +143,14 @@ public class KeycloakConfigurer {
                 logger.info("{} = '{}' Found config directory", KEYCLOAK_CONFIG_DIRECTORY_ENV_VARIABLE, configDirectory);
             }
         }
-        String keycloakUrl = System.getenv(KEYCLOAK_URL_ENV_VARIABLE);
-        if (keycloakUrl == null) {
-            configValid = false;
-            logger.warn("No keycloak URL provided.. ({})", KEYCLOAK_URL_ENV_VARIABLE);
-        } else {
-            logger.info("{} = '{}' Found Keycloak URL", KEYCLOAK_URL_ENV_VARIABLE, keycloakUrl);
+        if (keycloakUrl==null || keycloakUrl.isBlank()) {
+            keycloakUrl = System.getenv(KEYCLOAK_URL_ENV_VARIABLE);
+            if (keycloakUrl == null) {
+                configValid = false;
+                logger.warn("No keycloak URL provided.. ({})", KEYCLOAK_URL_ENV_VARIABLE);
+            } else {
+                logger.info("{} = '{}' Found Keycloak URL", KEYCLOAK_URL_ENV_VARIABLE, keycloakUrl);
+            }
         }
         String realmAdminUsername = System.getenv(MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE);
         if (realmAdminUsername == null) {
