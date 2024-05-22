@@ -5,7 +5,6 @@ import com.paulhowells.keycloak.configurer.KeycloakConfigurer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,12 +63,14 @@ public class DockerImageTest {
     public void testResolvedEventLogging() throws IOException {
         logger.debug("<testResolvedEventLogging");
 
+        assertFalse(keycloakLogs.isEmpty(), "Expecting to find some Keycloak logs");
+
         List<String> auditLogs = keycloakLogs.stream().filter(log -> log.contains("DEBUG [org.keycloak.events]")).toList();
-        assertFalse(auditLogs.isEmpty());
+        assertFalse(auditLogs.isEmpty(), "Expecting to find some audit logs");
 
         List<String> resolvedLoggingEnabledLogs = auditLogs.stream().filter(log -> log.contains("operationType=\"UPDATE\"") && log.contains("resourceType=\"REALM\"") && log.contains("resourcePath=\"events/config\"")).toList();
 
-        assertFalse(resolvedLoggingEnabledLogs.isEmpty());
+        assertFalse(resolvedLoggingEnabledLogs.isEmpty(), "Expecting to find a log entry for the enabling of the resolved logging provider");
         String resolvedLoggingEnabledLog = resolvedLoggingEnabledLogs.get(0);
 
         int resolvedLoggingEnabledIndex = auditLogs.indexOf(resolvedLoggingEnabledLog);
@@ -79,9 +80,9 @@ public class DockerImageTest {
             String log = auditLogs.get(i);
 
             logger.debug("KEYCLOAK LOG: "+log);
-            assertTrue(log.contains("realm=\"test_resolved_eventLogger\""));
-            assertTrue(log.contains("userRealm=\"master\""));
-            assertTrue(log.contains("username=\""+KEYCLOAK_ADMIN_USERNAME+"\""));
+            assertTrue(log.contains("realm=\"test_resolved_eventLogger\""), "Expecting log entry to show the test_resolved_eventLogger realm.");
+            assertTrue(log.contains("userRealm=\"master\""), "Expecting log entry to show the master user realm.");
+            assertTrue(log.contains("username=\""+KEYCLOAK_ADMIN_USERNAME+"\""), "Expecting log entry to show the "+KEYCLOAK_ADMIN_USERNAME+" user.");
         }
 
         logger.debug(">testResolvedEventLogging");
