@@ -6,7 +6,7 @@
 
     <groupId>com.paulhowells.keycloak</groupId>
     <artifactId>custom-keycloak-parent</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>custom-infinispan-docker-image</module>
