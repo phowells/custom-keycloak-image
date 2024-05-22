@@ -6,7 +6,7 @@
     </appender>
 
     <logger name="com.paulhowells" level="DEBUG" />
-    <logger name="com.paulhowells.keycloak.configurer.KeycloakConfigurer" level="INFO" />
+    <logger name="com.paulhowells.keycloak.configurer" level="INFO" />
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
