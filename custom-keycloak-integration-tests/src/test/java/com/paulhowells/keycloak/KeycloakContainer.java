@@ -36,8 +36,9 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
             paths
                     .filter(Files::isRegularFile)
                     .forEach(p -> {
-                        logger.debug(p.getFileName()+"="+p);
-                        result.withFileFromPath(p.getFileName().toString(), p);
+                        String filename = String.format("providers/%s",p.getFileName());
+                        logger.debug(filename+"="+p);
+                        result.withFileFromPath(filename, p);
                     });
         } catch (IOException e) {
             throw new RuntimeException(e);
