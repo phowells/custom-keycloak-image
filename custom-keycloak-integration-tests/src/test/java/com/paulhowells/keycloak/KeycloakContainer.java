@@ -1,23 +1,48 @@
 package com.paulhowells.keycloak;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.stream.Stream;
 
 public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakContainer.class);
 
     private static final int HTTP_PORT_INTERNAL = 8080;
 
     private static final long WAIT_TIMEOUT_IN_SECONDS = 60L;
 
-    public KeycloakContainer() {
-        super(new ImageFromDockerfile()
-                .withFileFromClasspath("Dockerfile", "Dockerfile")
-                .withFileFromClasspath("providers", "/home/paul_steven_howells/dev/custom-keycloak-image/custom-keycloak-integration-tests/providers"));
+    public KeycloakContainer() throws IOException {
+        super(getImageFromDockerfile());
+    }
+
+    private static ImageFromDockerfile getImageFromDockerfile() throws IOException {
+        logger.debug("<getImageFromDockerfile");
+        ImageFromDockerfile result = new ImageFromDockerfile();
+
+        result.withFileFromClasspath("Dockerfile", "Dockerfile");
+
+        try (Stream<Path> paths = Files.walk(Paths.get("/home/paul_steven_howells/dev/custom-keycloak-image/custom-keycloak-integration-tests/providers"))) {
+            paths
+                    .filter(Files::isRegularFile)
+                    .forEach(p -> {
+                        logger.debug(p.getFileName()+"="+p);
+                        result.withFileFromPath(p.getFileName().toString(), p);
+                    });
+        }
+
+        logger.debug(">getImageFromDockerfile");
+        return result;
     }
 
     public String getUrl() {
