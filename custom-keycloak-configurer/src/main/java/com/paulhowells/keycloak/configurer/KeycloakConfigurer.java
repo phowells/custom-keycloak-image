@@ -78,6 +78,7 @@ public class KeycloakConfigurer {
         String configDirectory = null;
         String keycloakUrl = null;
         for (String arg:args) {
+            logger.info("arg="+arg);
             if (arg.startsWith(KEYCLOAK_CONFIG_DIRECTORY_ARG)) {
 
                 configDirectory = arg.substring(KEYCLOAK_CONFIG_DIRECTORY_ARG.length());
@@ -131,7 +132,7 @@ public class KeycloakConfigurer {
     }
 
     private void run(String configDirectory, String keycloakUrl) throws IOException {
-        logger.debug("<run");
+        logger.debug("<run "+keycloakUrl);
 
         boolean configValid = true;
         if (configDirectory == null) {
