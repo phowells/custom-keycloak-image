@@ -34,11 +34,11 @@ public class EventSettingsConfigurer {
 
         EventSettings current = getDefinition(realm, eventsConfig);
 
-        logger.info("Checking realm {} email settings for updates", realm.getRealm());
+        logger.info("Checking realm {} event settings for updates", realm.getRealm());
 
         if (isDirty(current, definition)) {
 
-            logger.info("Updating realm {} email settings", realm.getRealm());
+            logger.info("Updating realm {} event settings", realm.getRealm());
 
             applyDefinition(
                     definition,

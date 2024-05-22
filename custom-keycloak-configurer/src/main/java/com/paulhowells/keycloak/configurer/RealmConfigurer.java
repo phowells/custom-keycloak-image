@@ -314,6 +314,12 @@ public class RealmConfigurer {
 
         realm = keycloakRestApi.getRealmByName(realmDefinition.getRealmName());
 
+        // Do the events first so we can see the events in the logs ASAP
+        eventSettingsConfigurer.updateEventSettings(
+                realm,
+                realmDefinition.getEventSettings()
+        );
+
         generalSettingsConfigurer.updateGeneralSettings(
                 realm,
                 realmDefinition.getGeneralSettings()
@@ -327,11 +333,6 @@ public class RealmConfigurer {
         emailSettingsConfigurer.updateEmailSettings(
                 realm,
                 realmDefinition.getEmailSettings()
-        );
-
-        eventSettingsConfigurer.updateEventSettings(
-                realm,
-                realmDefinition.getEventSettings()
         );
 
         sessionSettingsConfigurer.updateSessionSettings(
@@ -412,6 +413,12 @@ public class RealmConfigurer {
             logger.info("No Change");
         }
 
+        // Do the events first so we can see the events in the logs ASAP
+        result = eventSettingsConfigurer.updateEventSettings(
+                realm,
+                realmDefinition.getEventSettings()
+        ) || result;
+
         result = generalSettingsConfigurer.updateGeneralSettings(
                 realm,
                 realmDefinition.getGeneralSettings()
@@ -425,11 +432,6 @@ public class RealmConfigurer {
         result = emailSettingsConfigurer.updateEmailSettings(
                 realm,
                 realmDefinition.getEmailSettings()
-        ) || result;
-
-        result = eventSettingsConfigurer.updateEventSettings(
-                realm,
-                realmDefinition.getEventSettings()
         ) || result;
 
         result = sessionSettingsConfigurer.updateSessionSettings(
