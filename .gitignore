@@ -62,3 +62,5 @@ build/
 /custom-keycloak-event-logger/target/
 
 custom-keycloak-external-integration-tests/target/
+
+custom-keycloak-integration-tests/providers/
