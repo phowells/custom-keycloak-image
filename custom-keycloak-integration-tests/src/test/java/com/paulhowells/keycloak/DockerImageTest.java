@@ -51,7 +51,7 @@ public class DockerImageTest {
         logger.debug("<test");
 
         {
-            URL configUrl = getClass().getResource("/keycloak-config");
+            URL configUrl = getClass().getResource("/test-config");
             logger.debug("configUrl={}", configUrl);
             String keycloakUrl = container.getUrl();
             logger.debug("keycloakUrl={}", keycloakUrl);
