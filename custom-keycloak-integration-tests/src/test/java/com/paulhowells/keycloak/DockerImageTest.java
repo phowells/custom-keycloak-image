@@ -77,7 +77,7 @@ public class DockerImageTest {
 
         int resolvedLoggingEnabledIndex = auditLogs.indexOf(resolvedLoggingEnabledLog);
 
-        for (int i=resolvedLoggingEnabledIndex;i<auditLogs.size();++i) {
+        for (int i=resolvedLoggingEnabledIndex + 1;i<auditLogs.size();++i) {
             String log = auditLogs.get(i);
 
             logger.debug("KEYCLOAK LOG: "+log);
