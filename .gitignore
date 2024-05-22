@@ -60,3 +60,5 @@ build/
 /custom-keycloak-google-iap-jwt-authenticator/target/
 /external-secrets-helm/helm/
 /custom-keycloak-event-logger/target/
+
+custom-keycloak-external-integration-tests/target/

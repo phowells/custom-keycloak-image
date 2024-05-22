@@ -14,6 +14,7 @@
         <module>custom-keycloak-configurer-docker-image</module>
         <module>custom-keycloak-docker-image</module>
         <module>custom-keycloak-event-logger</module>
+        <module>custom-keycloak-external-integration-tests</module>
         <module>custom-keycloak-google-iap-jwt-authenticator</module>
         <module>custom-keycloak-integration-tests</module>
         <module>custom-keycloak-saml2-bearer-authenticator</module>

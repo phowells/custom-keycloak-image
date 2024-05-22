@@ -1,0 +1,50 @@
+---
+authenticationFlows:
+  - realmName: "master"
+    alias: "google first broker login"
+    description: "Actions taken after first broker login with Google account,\
+    \ which is not yet linked to any Keycloak account"
+    providerId: "basic-flow"
+    executions:
+      - !<authenticator>
+        providerId: "idp-review-profile"
+        displayName: "Review Profile"
+        requirement: "REQUIRED"
+        config:
+          update.profile.on.first.login: "missing"
+          name: "google first broker login review profile config"
+        type: "authenticator"
+      - !<flow>
+        providerId: "basic-flow"
+        displayName: "google first broker login User creation or linking"
+        requirement: "REQUIRED"
+        description: "Flow for the existing/non-existing user alternatives"
+        executions:
+          - !<flow>
+            providerId: "basic-flow"
+            displayName: "google first broker login Handle Existing Account"
+            requirement: "ALTERNATIVE"
+            description: "Handle what to do if there is existing account with same email/username\
+        \ like authenticated identity provider"
+            executions:
+              - !<authenticator>
+                providerId: "idp-confirm-link"
+                displayName: "Confirm link existing account"
+                requirement: "REQUIRED"
+                config: {}
+                type: "authenticator"
+              - !<flow>
+                providerId: "basic-flow"
+                displayName: "google first broker login Account verification options"
+                requirement: "REQUIRED"
+                description: "Method with which to verity the existing account"
+                executions:
+                  - !<authenticator>
+                    providerId: "idp-email-verification"
+                    displayName: "Verify existing account by Email"
+                    requirement: "ALTERNATIVE"
+                    config: {}
+                    type: "authenticator"
+                type: "flow"
+            type: "flow"
+        type: "flow"
