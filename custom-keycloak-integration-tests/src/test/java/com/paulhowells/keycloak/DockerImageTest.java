@@ -35,8 +35,6 @@ public class DockerImageTest {
     }
 
     @BeforeAll
-    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
-    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
     static void beforeAll() throws IOException {
 
         container.start();
@@ -49,7 +47,9 @@ public class DockerImageTest {
 
         String[] args = {
                 String.format("--config=%s", configUrl.getPath()),
-                String.format("--keycloak-url=%s", keycloakUrl)
+                String.format("--keycloak-url=%s", keycloakUrl),
+                String.format("--username=%s", KEYCLOAK_ADMIN_USERNAME),
+                String.format("--password=%s", KEYCLOAK_ADMIN_PASSWORD)
         };
 
         KeycloakConfigurer.main(args);
@@ -61,25 +61,8 @@ public class DockerImageTest {
     }
 
     @Test
-//    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
-//    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
     public void testResolvedEventLogging() throws IOException {
         logger.debug("<testResolvedEventLogging");
-
-//        {
-//            URL configUrl = getClass().getResource("/test-config");
-//            logger.debug("configUrl={}", configUrl);
-//            String keycloakUrl = container.getUrl();
-//            logger.debug("keycloakUrl={}", keycloakUrl);
-//            assertNotNull(configUrl);
-//
-//            String[] args = {
-//                    String.format("--config=%s", configUrl.getPath()),
-//                    String.format("--keycloak-url=%s", keycloakUrl)
-//            };
-//
-//            KeycloakConfigurer.main(args);
-//        }
 
         List<String> auditLogs = keycloakLogs.stream().filter(log -> log.contains("DEBUG [org.keycloak.events]")).toList();
         assertFalse(auditLogs.isEmpty());
