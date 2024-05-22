@@ -7,10 +7,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DockerImageTest extends BaseKeycloakTest {
-    private static final Logger logger = LoggerFactory.getLogger(DockerImageTest.class);
+public class DockerImageTestAgain extends BaseKeycloakTest {
+    private static final Logger logger = LoggerFactory.getLogger(DockerImageTestAgain.class);
 
     @Test
     public void testResolvedEventLogging() throws IOException {
