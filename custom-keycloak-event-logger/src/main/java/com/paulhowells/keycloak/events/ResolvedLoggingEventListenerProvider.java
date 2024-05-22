@@ -69,7 +69,8 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             String[] resolved = resolve(event.getRealmId(), event.getUserId());
 
             String realmName = resolved[0];
-            String username = resolved[1];
+            String userRealm = resolved[1];
+            String username = resolved[2];
 
             StringBuilder sb = new StringBuilder();
 
@@ -83,6 +84,8 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             sanitize(sb, event.getClientId());
             sb.append(", userId=");
             sanitize(sb, event.getUserId());
+            sb.append(", userRealm=");
+            sanitize(sb, userRealm);
             sb.append(", username=");
             sanitize(sb, username);
             sb.append(", ipAddress=");
@@ -130,7 +133,8 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             String[] resolved = resolve(adminEvent.getRealmId(), adminEvent.getAuthDetails().getUserId());
 
             String realmName = resolved[0];
-            String username = resolved[1];
+            String userRealm = resolved[1];
+            String username = resolved[2];
 
             StringBuilder sb = new StringBuilder();
 
@@ -145,6 +149,8 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             sanitize(sb, adminEvent.getAuthDetails().getClientId());
             sb.append(", userId=");
             sanitize(sb, adminEvent.getAuthDetails().getUserId());
+            sb.append(", userRealm=");
+            sanitize(sb, userRealm);
             sb.append(", username=");
             sanitize(sb, username);
 
@@ -171,6 +177,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
     private String[] resolve(String realmId, String userId) {
 
         AtomicReference<String> realmName = new AtomicReference<>();
+        AtomicReference<String> userRealm = new AtomicReference<>();
         AtomicReference<String> username = new AtomicReference<>();
 
         KeycloakModelUtils.runJobInTransaction(session.getKeycloakSessionFactory(), s -> {
@@ -178,6 +185,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
 
             if (realm != null) {
                 realmName.set(realm.getName());
+                userRealm.set(realm.getName());
 
                 logger.info("userId="+userId);
                 if (userId != null && !userId.isBlank()) {
@@ -187,6 +195,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
                     if (user == null) {
 
                         RealmModel masterRealm = s.realms().getRealmByName("master");
+                        userRealm.set(masterRealm.getName());
 
                         user = s.users().getUserById(masterRealm, userId);
                         logger.info("user="+user);
@@ -200,7 +209,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             }
         });
 
-        return new String[] {realmName.get(), username.get()};
+        return new String[] {realmName.get(), userRealm.get(), username.get()};
     }
 
     @Override
