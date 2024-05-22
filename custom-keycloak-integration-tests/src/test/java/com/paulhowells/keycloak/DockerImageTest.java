@@ -13,6 +13,10 @@ public class DockerImageTest {
             new ImageFromDockerfile()
                     .withFileFromClasspath("Dockerfile", "Dockerfile"));
 
+    static {
+        container.addEnv("KC_LOG_LEVEL", "INFO");
+    }
+
     @BeforeAll
     static void beforeAll() {
         container.start();
