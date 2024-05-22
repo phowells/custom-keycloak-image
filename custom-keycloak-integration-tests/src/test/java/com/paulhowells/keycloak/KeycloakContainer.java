@@ -31,7 +31,7 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
         this.addEnv("KC_HTTP_PORT", String.valueOf(HTTP_PORT_INTERNAL));
         this.withExposedPorts(HTTP_PORT_INTERNAL);
 
-        combinedWaitAllStrategy(waitForListeningPort());
+//        combinedWaitAllStrategy(waitForListeningPort());
     }
 
     private WaitStrategy waitForListeningPort() {
