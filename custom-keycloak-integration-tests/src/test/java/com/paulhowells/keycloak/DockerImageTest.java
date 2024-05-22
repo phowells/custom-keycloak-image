@@ -35,9 +35,24 @@ public class DockerImageTest {
     }
 
     @BeforeAll
-    static void beforeAll() {
+    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
+    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
+    static void beforeAll() throws IOException {
 
         container.start();
+
+        URL configUrl = DockerImageTest.class.getResource("/test-config");
+        logger.debug("configUrl={}", configUrl);
+        String keycloakUrl = container.getUrl();
+        logger.debug("keycloakUrl={}", keycloakUrl);
+        assertNotNull(configUrl);
+
+        String[] args = {
+                String.format("--config=%s", configUrl.getPath()),
+                String.format("--keycloak-url=%s", keycloakUrl)
+        };
+
+        KeycloakConfigurer.main(args);
     }
 
     @AfterAll
@@ -46,36 +61,36 @@ public class DockerImageTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
-    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
+//    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
+//    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
     public void testResolvedEventLogging() throws IOException {
         logger.debug("<testResolvedEventLogging");
 
-        {
-            URL configUrl = getClass().getResource("/test-config");
-            logger.debug("configUrl={}", configUrl);
-            String keycloakUrl = container.getUrl();
-            logger.debug("keycloakUrl={}", keycloakUrl);
-            assertNotNull(configUrl);
-
-            String[] args = {
-                    String.format("--config=%s", configUrl.getPath()),
-                    String.format("--keycloak-url=%s", keycloakUrl)
-            };
-
-            KeycloakConfigurer.main(args);
-        }
+//        {
+//            URL configUrl = getClass().getResource("/test-config");
+//            logger.debug("configUrl={}", configUrl);
+//            String keycloakUrl = container.getUrl();
+//            logger.debug("keycloakUrl={}", keycloakUrl);
+//            assertNotNull(configUrl);
+//
+//            String[] args = {
+//                    String.format("--config=%s", configUrl.getPath()),
+//                    String.format("--keycloak-url=%s", keycloakUrl)
+//            };
+//
+//            KeycloakConfigurer.main(args);
+//        }
 
         List<String> auditLogs = keycloakLogs.stream().filter(log -> log.contains("DEBUG [org.keycloak.events]")).toList();
-        logger.debug("auditLogs="+auditLogs.size());
+        assertFalse(auditLogs.isEmpty());
 
         List<String> resolvedLoggingEnabledLogs = auditLogs.stream().filter(log -> log.contains("operationType=\"UPDATE\"") && log.contains("resourceType=\"REALM\"") && log.contains("resourcePath=\"events/config\"")).toList();
-        logger.debug("resolvedLoggingEnabledLogs="+resolvedLoggingEnabledLogs.size());
 
         assertFalse(resolvedLoggingEnabledLogs.isEmpty());
         String resolvedLoggingEnabledLog = resolvedLoggingEnabledLogs.get(0);
 
         int resolvedLoggingEnabledIndex = auditLogs.indexOf(resolvedLoggingEnabledLog);
+        assertTrue(resolvedLoggingEnabledLogs.size() > resolvedLoggingEnabledIndex + 1);
 
         for (int i=resolvedLoggingEnabledIndex + 1;i<auditLogs.size();++i) {
             String log = auditLogs.get(i);
