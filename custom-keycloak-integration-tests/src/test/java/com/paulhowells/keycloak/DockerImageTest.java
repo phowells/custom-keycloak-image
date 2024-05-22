@@ -67,9 +67,9 @@ public class DockerImageTest {
             KeycloakConfigurer.main(args);
         }
 
-        Pattern filterPattern = Pattern.compile("^DEBUG \\[org.keycloak.events\\].*$");
-        Pattern resolvedLoggingEnabledPattern = Pattern.compile("^DEBUG \\[org.keycloak.events\\].*operationType=\"UPDATE\".*realm=\"test_resolved_eventLogger\".*resourceType=\"REALM\".*resourcePath=\"events/config\".*$");
-        Pattern resolvedLoggerPattern = Pattern.compile("^DEBUG \\[org.keycloak.events\\].*operationType=\"([^\"]+)\".*realmId=\"([^\"]+)\".*realm=\"([^\"]+)\".*userId=\"([^\"]+)\".*userRealm=\"([^\"]+)\".*username=\"([^\"]+)\".*resourceType=\"([^\"]+)\".*resourcePath=\"([^\"]+)\".*$");
+        Pattern filterPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*$");
+        Pattern resolvedLoggingEnabledPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*operationType=\"UPDATE\".*realm=\"test_resolved_eventLogger\".*resourceType=\"REALM\".*resourcePath=\"events/config\".*$");
+        Pattern resolvedLoggerPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*operationType=\"([^\"]+)\".*realmId=\"([^\"]+)\".*realm=\"([^\"]+)\".*userId=\"([^\"]+)\".*userRealm=\"([^\"]+)\".*username=\"([^\"]+)\".*resourceType=\"([^\"]+)\".*resourcePath=\"([^\"]+)\".*$");
 
         List<String> auditLogs = keycloakLogs.stream().filter(log -> {
             logger.debug(log);
