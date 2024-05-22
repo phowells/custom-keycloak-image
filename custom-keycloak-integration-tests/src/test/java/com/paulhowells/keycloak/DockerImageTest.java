@@ -46,6 +46,17 @@ public class DockerImageTest {
     static void afterAll() {
         container.stop();
     }
+
+    @Test
+    public void testRegex() {
+
+        Pattern filterPattern = Pattern.compile(".*DEBUG \\[org.keycloak.events\\].*");
+        String log = "2024-05-22 22:04:15,577 DEBUG [org.keycloak.events] (executor-thread-1) operationType=\"DELETE\", realmId=\"e2b4d8e1-f04e-46f3-b202-d88d76d4161f\", realm=\"test_resolved_eventLogger\", clientId=\"e5778ab2-18bb-4a8d-bd8e-53dd53f5f9da\", userId=\"8e5fac50-19cd-44a3-80ae-996206accc0d\", userRealm=\"master\", username=\"admin\", ipAddress=\"172.17.0.1\", resourceType=\"REALM_ROLE\", resourcePath=\"roles-by-id/a268a2b9-8b82-4074-993e-e279e0b6db48/composites\"";
+
+        boolean matches = filterPattern.matcher(log).matches();
+        assertTrue(matches);
+    }
+
     @Test
     @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
     @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
@@ -71,13 +82,7 @@ public class DockerImageTest {
         Pattern resolvedLoggingEnabledPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*operationType=\"UPDATE\".*realm=\"test_resolved_eventLogger\".*resourceType=\"REALM\".*resourcePath=\"events/config\".*$");
         Pattern resolvedLoggerPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*operationType=\"([^\"]+)\".*realmId=\"([^\"]+)\".*realm=\"([^\"]+)\".*userId=\"([^\"]+)\".*userRealm=\"([^\"]+)\".*username=\"([^\"]+)\".*resourceType=\"([^\"]+)\".*resourcePath=\"([^\"]+)\".*$");
 
-        List<String> auditLogs = keycloakLogs.stream().filter(log -> {
-            logger.debug(log);
-            logger.debug("pattern="+filterPattern.pattern());
-            boolean matches = filterPattern.matcher(log).matches();
-            logger.debug("matches="+matches);
-            return matches;
-        }).toList();
+        List<String> auditLogs = keycloakLogs.stream().filter(log -> log.contains("DEBUG [org.keycloak.events]")).toList();
         logger.debug("auditLogs="+auditLogs.size());
 
         List<String> resolvedLoggingEnabledLogs = auditLogs.stream().filter(log -> resolvedLoggingEnabledPattern.matcher(log).matches()).toList();
