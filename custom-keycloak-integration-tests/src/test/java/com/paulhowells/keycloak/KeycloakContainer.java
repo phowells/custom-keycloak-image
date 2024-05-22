@@ -28,10 +28,11 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
     protected void configure() {
         super.configure();
 
+        this.withCommand("start-dev");
         this.addEnv("KC_HTTP_PORT", String.valueOf(HTTP_PORT_INTERNAL));
         this.withExposedPorts(HTTP_PORT_INTERNAL);
 
-//        combinedWaitAllStrategy(waitForListeningPort());
+        combinedWaitAllStrategy(waitForListeningPort());
     }
 
     private WaitStrategy waitForListeningPort() {
