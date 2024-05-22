@@ -32,7 +32,10 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
 
         result.withFileFromClasspath("Dockerfile", "Dockerfile");
 
-        try (Stream<Path> paths = Files.walk(Paths.get("/home/paul_steven_howells/dev/custom-keycloak-image/custom-keycloak-integration-tests/providers"))) {
+        Path providersPath = Paths.get("providers");
+
+//        try (Stream<Path> paths = Files.walk(Paths.get("/home/paul_steven_howells/dev/custom-keycloak-image/custom-keycloak-integration-tests/providers"))) {
+        try (Stream<Path> paths = Files.walk(providersPath)) {
             paths
                     .filter(Files::isRegularFile)
                     .forEach(p -> {
