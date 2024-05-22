@@ -80,6 +80,7 @@ public class DockerImageTest {
         for (int i=resolvedLoggingEnabledIndex;i<auditLogs.size();++i) {
             String log = auditLogs.get(i);
 
+            logger.debug("KEYCLOAK LOG: "+log);
             assertTrue(log.contains("realm=\"test_resolved_eventLogger\""));
             assertTrue(log.contains("userRealm=\"master\""));
             assertTrue(log.contains("username=\""+KEYCLOAK_ADMIN_USERNAME+"\""));
