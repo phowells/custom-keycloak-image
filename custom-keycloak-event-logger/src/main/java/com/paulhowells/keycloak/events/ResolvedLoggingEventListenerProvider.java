@@ -187,10 +187,8 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
                 realmName.set(realm.getName());
                 userRealm.set(realm.getName());
 
-                logger.info("userId="+userId);
                 if (userId != null && !userId.isBlank()) {
                     UserModel user = s.users().getUserById(realm, userId);
-                    logger.info("user="+user);
 
                     if (user == null) {
 
@@ -198,7 +196,6 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
                         userRealm.set(masterRealm.getName());
 
                         user = s.users().getUserById(masterRealm, userId);
-                        logger.info("user="+user);
                     }
 
                     if (user != null) {

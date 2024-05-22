@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DockerImageTest {
     private static final Logger logger = LoggerFactory.getLogger(DockerImageTest.class);
@@ -65,7 +67,33 @@ public class DockerImageTest {
             KeycloakConfigurer.main(args);
         }
 
-        keycloakLogs.forEach(logger::debug);
+        Pattern filterPattern = Pattern.compile("^DEBUG \\[org.keycloak.events\\].*$");
+        Pattern resolvedLoggingEnabledPattern = Pattern.compile("^DEBUG \\[org.keycloak.events\\].*operationType=\"UPDATE\".*realm=\"test_resolved_eventLogger\".*resourceType=\"REALM\".*resourcePath=\"events/config\".*$");
+        Pattern resolvedLoggerPattern = Pattern.compile("^DEBUG \\[org.keycloak.events\\].*operationType=\"([^\"]+)\".*realmId=\"([^\"]+)\".*realm=\"([^\"]+)\".*userId=\"([^\"]+)\".*userRealm=\"([^\"]+)\".*username=\"([^\"]+)\".*resourceType=\"([^\"]+)\".*resourcePath=\"([^\"]+)\".*$");
+
+        List<String> auditLogs = keycloakLogs.stream().filter(log -> filterPattern.matcher(log).hasMatch()).toList();
+
+        List<String> resolvedLoggingEnabledLogs = auditLogs.stream().filter(log -> resolvedLoggingEnabledPattern.matcher(log).hasMatch()).toList();
+
+        assertFalse(resolvedLoggingEnabledLogs.isEmpty());
+        String resolvedLoggingEnabledLog = resolvedLoggingEnabledLogs.getFirst();
+
+        int resolvedLoggingEnabledIndex = auditLogs.indexOf(resolvedLoggingEnabledLog);
+
+        for (int i=resolvedLoggingEnabledIndex;i<auditLogs.size();++i) {
+            String log = auditLogs.get(i);
+
+            Matcher matcher = resolvedLoggerPattern.matcher(log);
+
+            assertTrue(matcher.matches());
+
+            String realm = matcher.group(3);
+            assertEquals("test_resolved_eventLogger", realm);
+            String userRealm = matcher.group(5);
+            assertEquals("master", userRealm);
+            String username = matcher.group(6);
+            assertEquals(KEYCLOAK_ADMIN_USERNAME, username);
+        }
 
         logger.debug(">test");
     }
