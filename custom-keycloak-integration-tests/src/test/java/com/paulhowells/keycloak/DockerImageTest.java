@@ -49,8 +49,8 @@ public class DockerImageTest {
     @Test
     @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
     @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
-    public void test() throws IOException {
-        logger.debug("<test");
+    public void testResolvedEventLogging() throws IOException {
+        logger.debug("<testResolvedEventLogging");
 
         {
             URL configUrl = getClass().getResource("/test-config");
@@ -67,7 +67,7 @@ public class DockerImageTest {
             KeycloakConfigurer.main(args);
         }
 
-        Pattern filterPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*$");
+        Pattern filterPattern = Pattern.compile(".*DEBUG \\[org.keycloak.events\\].*");
         Pattern resolvedLoggingEnabledPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*operationType=\"UPDATE\".*realm=\"test_resolved_eventLogger\".*resourceType=\"REALM\".*resourcePath=\"events/config\".*$");
         Pattern resolvedLoggerPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*operationType=\"([^\"]+)\".*realmId=\"([^\"]+)\".*realm=\"([^\"]+)\".*userId=\"([^\"]+)\".*userRealm=\"([^\"]+)\".*username=\"([^\"]+)\".*resourceType=\"([^\"]+)\".*resourcePath=\"([^\"]+)\".*$");
 
@@ -103,7 +103,7 @@ public class DockerImageTest {
             assertEquals(KEYCLOAK_ADMIN_USERNAME, username);
         }
 
-        logger.debug(">test");
+        logger.debug(">testResolvedEventLogging");
     }
 
 }
