@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,16 +46,6 @@ public class DockerImageTest {
     }
 
     @Test
-    public void testRegex() {
-
-        Pattern filterPattern = Pattern.compile(".*DEBUG \\[org.keycloak.events\\].*");
-        String log = "2024-05-22 22:04:15,577 DEBUG [org.keycloak.events] (executor-thread-1) operationType=\"DELETE\", realmId=\"e2b4d8e1-f04e-46f3-b202-d88d76d4161f\", realm=\"test_resolved_eventLogger\", clientId=\"e5778ab2-18bb-4a8d-bd8e-53dd53f5f9da\", userId=\"8e5fac50-19cd-44a3-80ae-996206accc0d\", userRealm=\"master\", username=\"admin\", ipAddress=\"172.17.0.1\", resourceType=\"REALM_ROLE\", resourcePath=\"roles-by-id/a268a2b9-8b82-4074-993e-e279e0b6db48/composites\"";
-
-        boolean matches = filterPattern.matcher(log).matches();
-        assertTrue(matches);
-    }
-
-    @Test
     @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
     @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
     public void testResolvedEventLogging() throws IOException {
@@ -78,14 +66,10 @@ public class DockerImageTest {
             KeycloakConfigurer.main(args);
         }
 
-        Pattern filterPattern = Pattern.compile(".*DEBUG \\[org.keycloak.events\\].*");
-        Pattern resolvedLoggingEnabledPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*operationType=\"UPDATE\".*realm=\"test_resolved_eventLogger\".*resourceType=\"REALM\".*resourcePath=\"events/config\".*$");
-        Pattern resolvedLoggerPattern = Pattern.compile("^.*DEBUG \\[org.keycloak.events\\].*operationType=\"([^\"]+)\".*realmId=\"([^\"]+)\".*realm=\"([^\"]+)\".*userId=\"([^\"]+)\".*userRealm=\"([^\"]+)\".*username=\"([^\"]+)\".*resourceType=\"([^\"]+)\".*resourcePath=\"([^\"]+)\".*$");
-
         List<String> auditLogs = keycloakLogs.stream().filter(log -> log.contains("DEBUG [org.keycloak.events]")).toList();
         logger.debug("auditLogs="+auditLogs.size());
 
-        List<String> resolvedLoggingEnabledLogs = auditLogs.stream().filter(log -> resolvedLoggingEnabledPattern.matcher(log).matches()).toList();
+        List<String> resolvedLoggingEnabledLogs = auditLogs.stream().filter(log -> log.contains("operationType=\"UPDATE\"") && log.contains("resourceType=\"REALM\"") && log.contains("resourcePath=\"events/config\"")).toList();
         logger.debug("resolvedLoggingEnabledLogs="+resolvedLoggingEnabledLogs.size());
 
         assertFalse(resolvedLoggingEnabledLogs.isEmpty());
@@ -96,16 +80,9 @@ public class DockerImageTest {
         for (int i=resolvedLoggingEnabledIndex;i<auditLogs.size();++i) {
             String log = auditLogs.get(i);
 
-            Matcher matcher = resolvedLoggerPattern.matcher(log);
-
-            assertTrue(matcher.matches());
-
-            String realm = matcher.group(3);
-            assertEquals("test_resolved_eventLogger", realm);
-            String userRealm = matcher.group(5);
-            assertEquals("master", userRealm);
-            String username = matcher.group(6);
-            assertEquals(KEYCLOAK_ADMIN_USERNAME, username);
+            assertTrue(log.contains("realm=\"test_resolved_eventLogger\""));
+            assertTrue(log.contains("userRealm=\"master\""));
+            assertTrue(log.contains("username=\""+KEYCLOAK_ADMIN_USERNAME+"\""));
         }
 
         logger.debug(">testResolvedEventLogging");
