@@ -16,7 +16,8 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
 
     public KeycloakContainer() {
         super(new ImageFromDockerfile()
-                .withFileFromClasspath("Dockerfile", "Dockerfile"));
+                .withFileFromClasspath("Dockerfile", "Dockerfile")
+                .withFileFromClasspath("providers", "/home/paul_steven_howells/dev/custom-keycloak-image/custom-keycloak-integration-tests/providers"));
     }
 
     public String getUrl() {
