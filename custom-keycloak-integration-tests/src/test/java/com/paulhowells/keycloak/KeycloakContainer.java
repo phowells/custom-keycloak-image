@@ -22,11 +22,11 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
 
     private static final long WAIT_TIMEOUT_IN_SECONDS = 60L;
 
-    public KeycloakContainer() throws IOException {
+    public KeycloakContainer() {
         super(getImageFromDockerfile());
     }
 
-    private static ImageFromDockerfile getImageFromDockerfile() throws IOException {
+    private static ImageFromDockerfile getImageFromDockerfile() {
         logger.debug("<getImageFromDockerfile");
         ImageFromDockerfile result = new ImageFromDockerfile();
 
@@ -39,6 +39,8 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
                         logger.debug(p.getFileName()+"="+p);
                         result.withFileFromPath(p.getFileName().toString(), p);
                     });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         logger.debug(">getImageFromDockerfile");
