@@ -179,10 +179,21 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             if (realm != null) {
                 realmName.set(realm.getName());
 
+                logger.info("userId="+userId);
                 if (userId != null && !userId.isBlank()) {
                     UserModel user = s.users().getUserById(realm, userId);
+                    logger.info("user="+user);
+
+                    if (user == null) {
+
+                        RealmModel masterRealm = s.realms().getRealmByName("master");
+
+                        user = s.users().getUserById(masterRealm, userId);
+                        logger.info("user="+user);
+                    }
 
                     if (user != null) {
+
                         username.set(user.getUsername());
                     }
                 }
