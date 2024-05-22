@@ -76,7 +76,7 @@ public class DockerImageTest {
         List<String> resolvedLoggingEnabledLogs = auditLogs.stream().filter(log -> resolvedLoggingEnabledPattern.matcher(log).matches()).toList();
 
         assertFalse(resolvedLoggingEnabledLogs.isEmpty());
-        String resolvedLoggingEnabledLog = resolvedLoggingEnabledLogs.getFirst();
+        String resolvedLoggingEnabledLog = resolvedLoggingEnabledLogs.get(0);
 
         int resolvedLoggingEnabledIndex = auditLogs.indexOf(resolvedLoggingEnabledLog);
 
