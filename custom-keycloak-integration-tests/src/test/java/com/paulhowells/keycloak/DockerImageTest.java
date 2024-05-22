@@ -76,7 +76,7 @@ public class DockerImageTest {
         int resolvedLoggingEnabledIndex = auditLogs.indexOf(resolvedLoggingEnabledLog);
         logger.debug("resolvedLoggingEnabledIndex="+resolvedLoggingEnabledIndex);
         logger.debug("resolvedLoggingEnabledLogs="+resolvedLoggingEnabledLogs.size());
-//        assertTrue(resolvedLoggingEnabledLogs.size() > resolvedLoggingEnabledIndex + 1);
+        assertTrue(auditLogs.size() > resolvedLoggingEnabledIndex + 1);
 
         for (int i=resolvedLoggingEnabledIndex + 1;i<auditLogs.size();++i) {
             String log = auditLogs.get(i);
