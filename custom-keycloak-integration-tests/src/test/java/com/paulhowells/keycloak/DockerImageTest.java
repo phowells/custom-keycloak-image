@@ -5,6 +5,7 @@ import com.paulhowells.keycloak.configurer.KeycloakConfigurer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +49,9 @@ public class DockerImageTest {
         container.stop();
     }
     @Test
-//    @SetEnvironmentVariable(key = KeycloakConfigurer.KEYCLOAK_URL_ENV_VARIABLE, value = KEYCLOAK_URL)
-//    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
-//    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
+    @SetEnvironmentVariable(key = KeycloakConfigurer.KEYCLOAK_URL_ENV_VARIABLE, value = KEYCLOAK_URL)
+    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_USERNAME_ENV_VARIABLE, value = KEYCLOAK_ADMIN_USERNAME)
+    @SetEnvironmentVariable(key = KeycloakConfigurer.MASTER_REALM_ADMIN_PASSWORD_ENV_VARIABLE, value = KEYCLOAK_ADMIN_PASSWORD)
     public void test() throws IOException {
         logger.debug("<test");
 
