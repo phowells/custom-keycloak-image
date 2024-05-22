@@ -10,12 +10,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DockerImageTestAgain extends BaseKeycloakTest {
-    private static final Logger logger = LoggerFactory.getLogger(DockerImageTestAgain.class);
+public class OtherDockerImageTest extends BaseKeycloakTest {
+    private static final Logger logger = LoggerFactory.getLogger(OtherDockerImageTest.class);
 
     @Test
-    public void testResolvedEventLogging() throws IOException {
-        logger.debug("<testResolvedEventLogging");
+    public void testOtherResolvedEventLogging() throws IOException {
+        logger.debug("<testOtherResolvedEventLogging");
 
         assertFalse(keycloakLogs.isEmpty(), "Expecting to find some Keycloak logs");
 
@@ -39,7 +39,7 @@ public class DockerImageTestAgain extends BaseKeycloakTest {
             assertTrue(log.contains("username=\""+KEYCLOAK_ADMIN_USERNAME+"\""), "Expecting log entry to show the "+KEYCLOAK_ADMIN_USERNAME+" user.");
         }
 
-        logger.debug(">testResolvedEventLogging");
+        logger.debug(">testOtherResolvedEventLogging");
     }
 
 }
