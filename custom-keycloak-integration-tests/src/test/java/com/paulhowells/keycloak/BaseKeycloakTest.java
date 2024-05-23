@@ -21,6 +21,9 @@ public abstract class BaseKeycloakTest {
 
     static final List<String> keycloakLogs = new ArrayList<>();
 
+    // A new Keycloak container will be created and initialized once for each test class
+    // It is not possible to reuse the container across test classes when you are using
+    // JUnit.
     static KeycloakContainer container = new KeycloakContainer()
         .withLogConsumer(outputFrame -> keycloakLogs.add(outputFrame.getUtf8String()));
 
