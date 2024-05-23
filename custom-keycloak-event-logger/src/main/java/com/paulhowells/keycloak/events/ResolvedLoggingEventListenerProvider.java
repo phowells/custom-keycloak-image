@@ -14,6 +14,7 @@ import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.utils.StringUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -62,7 +63,6 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
     }
 
     private void logEvent(Event event) {
-        logger.info("<logEvent");
         Logger.Level level = event.getError() != null ? errorLevel : successLevel;
 
         if (logger.isEnabled(level)) {
@@ -85,10 +85,6 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             sanitize(sb, event.getClientId());
             sb.append(", userId=");
             sanitize(sb, event.getUserId());
-            sb.append(", userRealm=");
-            sanitize(sb, userRealm);
-            sb.append(", username=");
-            sanitize(sb, username);
             sb.append(", ipAddress=");
             sanitize(sb, event.getIpAddress());
 
@@ -98,6 +94,11 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
             }
 
             if (event.getDetails() != null) {
+
+                Map<String, String> details = new HashMap<>(event.getDetails());
+                details.put("userRealm", userRealm);
+                details.put("username", username);
+
                 for (Map.Entry<String, String> e : event.getDetails().entrySet()) {
                     sb.append(", ");
                     sb.append(StringUtil.sanitizeSpacesAndQuotes(e.getKey(), null));
@@ -124,11 +125,9 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
 
             logger.log(logger.isTraceEnabled() ? Logger.Level.TRACE : level, sb.toString());
         }
-        logger.info(">logEvent");
     }
 
     private void logAdminEvent(AdminEvent adminEvent, boolean includeRepresentation) {
-        logger.info("<logAdminEvent");
         Logger.Level level = adminEvent.getError() != null ? errorLevel : successLevel;
 
         if (logger.isEnabled(level)) {
@@ -175,7 +174,6 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
 
             logger.log(logger.isTraceEnabled() ? Logger.Level.TRACE : level, sb.toString());
         }
-        logger.info(">logAdminEvent");
     }
 
     private String[] resolve(String realmId, String userId) {

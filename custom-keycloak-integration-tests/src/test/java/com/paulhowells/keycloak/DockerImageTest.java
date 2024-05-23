@@ -17,7 +17,6 @@ public class DockerImageTest extends BaseKeycloakTest {
         logger.debug("<testResolvedEventLogging");
 
         assertFalse(keycloakLogs.isEmpty(), "Expecting to find some Keycloak logs");
-        keycloakLogs.forEach(log -> logger.debug("KEYCLOAK LOG: "+log));
 
         List<String> auditLogs = keycloakLogs.stream().filter(log -> log.contains("DEBUG [org.keycloak.events]")).toList();
         assertFalse(auditLogs.isEmpty(), "Expecting to find some audit logs");

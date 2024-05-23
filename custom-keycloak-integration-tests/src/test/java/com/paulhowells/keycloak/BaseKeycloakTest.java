@@ -38,27 +38,30 @@ public abstract class BaseKeycloakTest {
     @BeforeAll
     static void beforeAll() throws IOException {
 
-        keycloakLogs.clear();
-        container.start();
+        if (!container.isRunning()) {
 
-        URL configUrl = BaseKeycloakTest.class.getResource("/test-config");
-        logger.debug("configUrl={}", configUrl);
-        String keycloakUrl = container.getUrl();
-        logger.debug("keycloakUrl={}", keycloakUrl);
-        assertNotNull(configUrl);
+            keycloakLogs.clear();
+            container.start();
 
-        String[] args = {
-                String.format("--config=%s", configUrl.getPath()),
-                String.format("--keycloak-url=%s", keycloakUrl),
-                String.format("--username=%s", KEYCLOAK_ADMIN_USERNAME),
-                String.format("--password=%s", KEYCLOAK_ADMIN_PASSWORD)
-        };
+            URL configUrl = BaseKeycloakTest.class.getResource("/test-config");
+            logger.debug("configUrl={}", configUrl);
+            String keycloakUrl = container.getUrl();
+            logger.debug("keycloakUrl={}", keycloakUrl);
+            assertNotNull(configUrl);
 
-        KeycloakConfigurer.main(args);
+            String[] args = {
+                    String.format("--config=%s", configUrl.getPath()),
+                    String.format("--keycloak-url=%s", keycloakUrl),
+                    String.format("--username=%s", KEYCLOAK_ADMIN_USERNAME),
+                    String.format("--password=%s", KEYCLOAK_ADMIN_PASSWORD)
+            };
+
+            KeycloakConfigurer.main(args);
+        }
     }
 
     @AfterAll
     static void afterAll() {
-        container.stop();
+//        container.stop();
     }
 }
