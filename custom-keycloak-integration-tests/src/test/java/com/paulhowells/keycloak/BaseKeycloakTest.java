@@ -38,6 +38,7 @@ public abstract class BaseKeycloakTest {
     @BeforeAll
     static void beforeAll() throws IOException {
 
+        keycloakLogs.clear();
         container.start();
 
         URL configUrl = BaseKeycloakTest.class.getResource("/test-config");
