@@ -62,6 +62,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
     }
 
     private void logEvent(Event event) {
+        logger.info("<logEvent");
         Logger.Level level = event.getError() != null ? errorLevel : successLevel;
 
         if (logger.isEnabled(level)) {
@@ -123,9 +124,11 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
 
             logger.log(logger.isTraceEnabled() ? Logger.Level.TRACE : level, sb.toString());
         }
+        logger.info(">logEvent");
     }
 
     private void logAdminEvent(AdminEvent adminEvent, boolean includeRepresentation) {
+        logger.info("<logAdminEvent");
         Logger.Level level = adminEvent.getError() != null ? errorLevel : successLevel;
 
         if (logger.isEnabled(level)) {
@@ -172,6 +175,7 @@ public class ResolvedLoggingEventListenerProvider implements EventListenerProvid
 
             logger.log(logger.isTraceEnabled() ? Logger.Level.TRACE : level, sb.toString());
         }
+        logger.info(">logAdminEvent");
     }
 
     private String[] resolve(String realmId, String userId) {
