@@ -18,6 +18,7 @@ public class OtherDockerImageTest extends BaseKeycloakTest {
         logger.debug("<testOtherResolvedEventLogging");
 
         assertFalse(keycloakLogs.isEmpty(), "Expecting to find some Keycloak logs");
+        keycloakLogs.forEach(log -> logger.debug("KEYCLOAK LOG: "+log));
 
         List<String> auditLogs = keycloakLogs.stream().filter(log -> log.contains("DEBUG [org.keycloak.events]")).toList();
         assertFalse(auditLogs.isEmpty(), "Expecting to find some audit logs");
@@ -33,7 +34,7 @@ public class OtherDockerImageTest extends BaseKeycloakTest {
         for (int i=resolvedLoggingEnabledIndex + 1;i<auditLogs.size();++i) {
             String log = auditLogs.get(i);
 
-            logger.debug("KEYCLOAK LOG: "+log);
+            logger.debug("AUDIT LOG: "+log);
             assertTrue(log.contains("realm=\"test_resolved_eventLogger\""), "Expecting log entry to show the test_resolved_eventLogger realm.");
             assertTrue(log.contains("userRealm=\"master\""), "Expecting log entry to show the master user realm.");
             assertTrue(log.contains("username=\""+KEYCLOAK_ADMIN_USERNAME+"\""), "Expecting log entry to show the "+KEYCLOAK_ADMIN_USERNAME+" user.");
