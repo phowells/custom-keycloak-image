@@ -21,9 +21,6 @@ public abstract class BaseKeycloakTest {
 
     static final List<String> keycloakLogs = new ArrayList<>();
 
-    // A new Keycloak container will be created and initialized once for each test class
-    // It is not possible to reuse the container across test classes when you are using
-    // JUnit.
     static KeycloakContainer container = new KeycloakContainer()
         .withLogConsumer(outputFrame -> keycloakLogs.add(outputFrame.getUtf8String()));
 
@@ -38,6 +35,10 @@ public abstract class BaseKeycloakTest {
     @BeforeAll
     static void beforeAll() throws IOException {
 
+        // We only want to start the Keycloak container once for all the subclasses.
+        // This will speed up the tests significantly
+        // We don't need to explicitly stop the container
+        // Ryuk will monitor and terminate the containers on JVM exit
         if (!container.isRunning()) {
 
             keycloakLogs.clear();
@@ -58,10 +59,5 @@ public abstract class BaseKeycloakTest {
 
             KeycloakConfigurer.main(args);
         }
-    }
-
-    @AfterAll
-    static void afterAll() {
-//        container.stop();
     }
 }
