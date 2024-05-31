@@ -1,3 +1,11 @@
+# The extensions image will use the Maven pom to build the extension jars
+FROM maven:3.8.2-openjdk-17 as extensions-image
+ENV BUILD_DIR=/usr/build
+RUN mkdir -p $BUILD_DIR
+COPY ./keycloak-extensions $BUILD_DIR
+WORKDIR $BUILD_DIR
+RUN mvn clean package
+
 FROM us-west1-docker.pkg.dev/keycloak-infinispan-poc/infinispan-poc-repo/rhbk/keycloak-rhel9:24-7 as builder
 
 # We will use the x-forwarded headers to support White Label domains
